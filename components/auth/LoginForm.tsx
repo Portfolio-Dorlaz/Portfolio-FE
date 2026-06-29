@@ -1,17 +1,44 @@
 'use client';
 
 import { Button, Card, Checkbox, Form, Input, Typography, message } from 'antd';
+import { useRouter } from 'next/navigation';
 import '../../styles/login.css';
+import { handleLogin } from '../../redux/slices/authSlice';
+import { useAppDispatch } from '@/redux/hooks';
 
 const { Title, Paragraph } = Typography;
 
-export default function LoginForm() {
-  const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+type LoginFormValues = {
+  email: string;
+  password: string;
+  remember?: boolean;
+};
 
-  const onFinish = (values: { email: string; password: string; remember?: boolean }) => {
-    messageApi.success(`Đăng nhập thử thành công: ${values.email}`);
-    form.resetFields(['password']);
+export default function LoginForm() {
+  const [form] = Form.useForm<LoginFormValues>();
+  const [messageApi, contextHolder] = message.useMessage();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const onFinish = async (values: LoginFormValues) => {
+    try {
+      const data = await dispatch(
+        handleLogin({
+          email: values.email,
+          password: values.password,
+        })
+      ).unwrap();
+
+      messageApi.success(`Đăng nhập thành công: ${data.user.fullName}`);
+      form.resetFields(['password']);
+      router.push('/');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        messageApi.error(error.message || 'Đăng nhập thất bại');
+      } else {
+        messageApi.error(String(error) || 'Đăng nhập thất bại');
+      }
+    }
   };
 
   return (
@@ -46,7 +73,7 @@ export default function LoginForm() {
               </Paragraph>
             </div>
 
-            <Form
+            <Form<LoginFormValues>
               form={form}
               layout="vertical"
               onFinish={onFinish}

@@ -1,16 +1,22 @@
-import 'antd/dist/reset.css';
-import '../styles/globals.css';
 import type { ReactNode } from 'react';
+import ReduxProvider from './providers';
+import '../styles/globals.css';
 
 export const metadata = {
-  title: 'Portfolio CMS Auth',
-  description: 'Login and register UI with Next.js App Router',
+  title: 'Portfolio',
+  description: 'Next app with Redux',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="vi">
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <ReduxProvider>{children}</ReduxProvider>
+      </body>
     </html>
   );
 }
