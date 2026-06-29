@@ -151,3 +151,13 @@
     justify-content: center;
   }
 }
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-weight: 500;
+}

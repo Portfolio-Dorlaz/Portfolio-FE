@@ -4,31 +4,41 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
-const API_DEV = process.env.NEXT_PUBLIC_API_URL;
-
-let accessToken: string | null = null;
-let refreshPromise: Promise<{ accessToken: string }> | null = null;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type ApiErrorResponse = {
   message?: string;
+};
+
+type RefreshResponse = {
+  accessToken: string;
+  user?: {
+    id: string;
+    fullName: string;
+    email: string;
+    role: string;
+  };
 };
 
 type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
-export const setAccessToken = (token: string | null) => {
+let accessToken: string | null = null;
+let refreshPromise: Promise<RefreshResponse> | null = null;
+
+export const setApiAccessToken = (token: string | null) => {
   accessToken = token;
 };
 
-export const getAccessToken = () => accessToken;
+export const getApiAccessToken = () => accessToken;
 
-export const clearAccessToken = () => {
+export const clearApiAccessToken = () => {
   accessToken = null;
 };
 
 export const api = axios.create({
-  baseURL: API_DEV,
+  baseURL: API_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -40,7 +50,6 @@ api.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
@@ -64,8 +73,8 @@ api.interceptors.response.use(
       try {
         if (!refreshPromise) {
           refreshPromise = axios
-            .post<{ accessToken: string }>(
-              `${API_DEV}/auth/refresh`,
+            .post<RefreshResponse>(
+              `${API_URL}/auth/refresh`,
               {},
               {
                 withCredentials: true,
@@ -74,22 +83,24 @@ api.interceptors.response.use(
                 },
               }
             )
-            .then((res) => res.data);
+            .then((res) => res.data)
+            .finally(() => {
+              refreshPromise = null;
+            });
         }
 
         const refreshData = await refreshPromise;
-        refreshPromise = null;
-
         const newAccessToken = refreshData.accessToken;
-        setAccessToken(newAccessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        setApiAccessToken(newAccessToken);
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
 
         return api(originalRequest as AxiosRequestConfig);
       } catch (refreshError) {
-        refreshPromise = null;
-        clearAccessToken();
-        window.location.href = '/auth/login';
+        clearApiAccessToken();
         return Promise.reject(refreshError);
       }
     }
@@ -101,3 +112,11 @@ api.interceptors.response.use(
     });
   }
 );
+
+export async function post<T>(url: string, body?: unknown) {
+  return api.post<T>(url, body).then((res) => res as unknown as T);
+}
+
+export async function get<T>(url: string) {
+  return api.get<T>(url).then((res) => res as unknown as T);
+}

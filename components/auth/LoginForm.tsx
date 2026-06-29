@@ -21,25 +21,25 @@ export default function LoginForm() {
   const router = useRouter();
 
   const onFinish = async (values: LoginFormValues) => {
-    try {
-      const data = await dispatch(
-        handleLogin({
-          email: values.email,
-          password: values.password,
-        })
-      ).unwrap();
+  try {
+    const data = await dispatch(
+      handleLogin({
+        email: values.email,
+        password: values.password,
+      })
+    ).unwrap();
 
-      messageApi.success(`Đăng nhập thành công: ${data.user.fullName}`);
-      form.resetFields(['password']);
-      router.push('/');
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        messageApi.error(error.message || 'Đăng nhập thất bại');
-      } else {
-        messageApi.error(String(error) || 'Đăng nhập thất bại');
-      }
+    messageApi.success(`Đăng nhập thành công: ${data.user.fullName}`);
+    form.resetFields(['password']);
+    router.push('/');
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'message' in error) {
+      messageApi.error(String((error as { message: unknown }).message) || 'Đăng nhập thất bại');
+    } else {
+      messageApi.error('Đăng nhập thất bại');
     }
-  };
+  }
+};
 
   return (
     <>
@@ -111,7 +111,7 @@ export default function LoginForm() {
 
               <Form.Item className="auth-submit-wrap">
                 <Button type="primary" htmlType="submit" block className="auth-submit">
-                  Sign in
+                  Đăng nhập
                 </Button>
               </Form.Item>
             </Form>
