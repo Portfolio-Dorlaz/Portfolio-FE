@@ -52,13 +52,6 @@ export default function LoginForm() {
           <p className="auth-description">
             Quản lý portfolio, blog, project showcase và nội dung cá nhân trong một dashboard gọn gàng.
           </p>
-
-          <div className="auth-note-box">
-            <span className="auth-badge">Admin only</span>
-            <p>
-              Đây là khu vực đăng nhập quản trị, không phải trang public dành cho người xem portfolio.
-            </p>
-          </div>
         </section>
 
         <section className="auth-right">

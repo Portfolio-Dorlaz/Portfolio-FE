@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { Button, Card, Form, Input, Typography, message } from 'antd';
 import '../../styles/register.css';
+import { useAppDispatch } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
+import { handleRegister } from '@/redux/slices/authSlice';
 
 type RegisterFormValues = {
   fullName: string;
@@ -14,12 +17,32 @@ type RegisterFormValues = {
 const { Title, Paragraph } = Typography;
 
 export default function RegisterForm() {
+     const dispatch = useAppDispatch();
+    const router = useRouter();
   const [form] = Form.useForm<RegisterFormValues>();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const onFinish = (values: RegisterFormValues) => {
-    messageApi.success(`Đăng ký thử thành công: ${values.email}`);
-    form.resetFields();
+
+   const onFinish = async (values: RegisterFormValues) => {
+    try {
+       await dispatch(
+        handleRegister({
+          email: values.email,
+          password: values.password,
+          fullName: values.fullName,
+        })
+      ).unwrap();
+  
+       messageApi.success(`Đăng ký thành công: ${values.email}`);
+       form.resetFields();
+      router.push('/');
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'message' in error) {
+        messageApi.error(String((error as { message: unknown }).message) || 'Đăng ký thất bại');
+      } else {
+        messageApi.error('Đăng ký thất bại');
+      }
+    }
   };
 
   return (
@@ -112,7 +135,7 @@ export default function RegisterForm() {
 
               <Form.Item className="auth-submit-wrap">
                 <Button type="primary" htmlType="submit" block className="auth-submit">
-                  Create account
+                  Tạo tài khoản
                 </Button>
               </Form.Item>
 

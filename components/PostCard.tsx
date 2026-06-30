@@ -1,4 +1,5 @@
 type Post = {
+  id: string;
   category: string;
   date: string;
   title: string;
@@ -20,7 +21,9 @@ export default function PostCard({ post }: { post: Post }) {
 
       <div className="post-footer">
         <span className="post-read-time">{post.readTime}</span>
-        <button className="read-more-button">Xem bài viết</button>
+        <a href={`/posts/${post.id}`} className="read-more-button">
+            Xem bài viết
+          </a>
       </div>
     </article>
   );
