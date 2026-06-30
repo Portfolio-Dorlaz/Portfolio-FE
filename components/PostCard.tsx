@@ -1,29 +1,37 @@
-type Post = {
+import Link from "next/link";
+import "../styles/post-card.css";
+
+type PostCardPost = {
   id: string;
-  category: string;
-  date: string;
+  slug: string;
   title: string;
   excerpt: string;
-  readTime: string;
+  category: string | null;
+  createdAt?: string;
+  publishedAt?: string | null;
+  thumbnailUrl?: string | null;
 };
 
-export default function PostCard({ post }: { post: Post }) {
+type Props = {
+  post: PostCardPost;
+};
+
+export default function PostCard({ post }: Props) {
   return (
     <article className="post-card">
       <div className="post-meta">
         <span className="post-category">{post.category}</span>
-        <span className="post-dot">•</span>
-        <span>{post.date}</span>
+        <span>{post.createdAt}</span>
       </div>
 
       <h3 className="post-title">{post.title}</h3>
       <p className="post-excerpt">{post.excerpt}</p>
 
       <div className="post-footer">
-        <span className="post-read-time">{post.readTime}</span>
-        <a href={`/posts/${post.id}`} className="read-more-button">
-            Xem bài viết
-          </a>
+        <span className="post-read-time">5 phút</span>
+        <Link href={`/posts/${post.slug}`} className="read-more-button">
+          Đọc thêm
+        </Link>
       </div>
     </article>
   );

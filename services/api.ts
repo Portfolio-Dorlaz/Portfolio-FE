@@ -113,10 +113,18 @@ api.interceptors.response.use(
   }
 );
 
+export async function get<T>(url: string) {
+  return api.get<T>(url).then((res) => res as unknown as T);
+}
+
 export async function post<T>(url: string, body?: unknown) {
   return api.post<T>(url, body).then((res) => res as unknown as T);
 }
 
-export async function get<T>(url: string) {
-  return api.get<T>(url).then((res) => res as unknown as T);
+export async function put<T>(url: string, body?: unknown): Promise<T> {
+  return api.put<T>(url, body).then((res) => res as unknown as T);
+}
+
+export async function del<T>(url: string) {
+  return api.delete<T>(url).then((res) => res as unknown as T);
 }

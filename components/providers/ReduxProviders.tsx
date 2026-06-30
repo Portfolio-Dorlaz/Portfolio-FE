@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Provider } from 'react-redux';
-import { store } from '@/redux/store';
-import AuthBootstrap from './AuthBootstrap';
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
+import AuthBootstrap from "./AuthBootstrap";
 
 type Props = {
   children: React.ReactNode;

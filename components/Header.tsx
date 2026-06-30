@@ -1,14 +1,11 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { handleLogout } from '../redux/slices/authSlice';
-import {
-  AuthenticatedSelector,
-  UserInfoSelector,
-} from '../redux/selector';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import '../styles/header.css';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { handleLogout } from "../redux/slices/authSlice";
+import { AuthenticatedSelector, UserInfoSelector } from "../redux/selector";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import "../styles/header.css";
 
 export default function Header() {
   const userInfo = useAppSelector(UserInfoSelector);
@@ -19,9 +16,9 @@ export default function Header() {
   const onLogout = async () => {
     try {
       await dispatch(handleLogout()).unwrap();
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -40,10 +37,12 @@ export default function Header() {
         <div className="site-actions">
           {isAuthenticated && userInfo ? (
             <div className="user-actions">
-              <span className="user-name">
-                Xin chào, {userInfo.fullName}
-              </span>
-              <button type="button" className="btn btn-outline" onClick={onLogout}>
+              <span className="user-name">Xin chào, {userInfo.fullName}</span>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={onLogout}
+              >
                 Đăng xuất
               </button>
             </div>

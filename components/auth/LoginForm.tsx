@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Button, Card, Checkbox, Form, Input, Typography, message } from 'antd';
-import { useRouter } from 'next/navigation';
-import '../../styles/login.css';
-import { handleLogin } from '../../redux/slices/authSlice';
-import { useAppDispatch } from '@/redux/hooks';
+import { Button, Card, Checkbox, Form, Input, Typography, message } from "antd";
+import { useRouter } from "next/navigation";
+import "../../styles/login.css";
+import { handleLogin } from "../../redux/slices/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 const { Title, Paragraph } = Typography;
 
@@ -21,25 +21,28 @@ export default function LoginForm() {
   const router = useRouter();
 
   const onFinish = async (values: LoginFormValues) => {
-  try {
-    const data = await dispatch(
-      handleLogin({
-        email: values.email,
-        password: values.password,
-      })
-    ).unwrap();
+    try {
+      const data = await dispatch(
+        handleLogin({
+          email: values.email,
+          password: values.password,
+        }),
+      ).unwrap();
 
-    messageApi.success(`Đăng nhập thành công: ${data.user.fullName}`);
-    form.resetFields(['password']);
-    router.push('/');
-  } catch (error: unknown) {
-    if (error && typeof error === 'object' && 'message' in error) {
-      messageApi.error(String((error as { message: unknown }).message) || 'Đăng nhập thất bại');
-    } else {
-      messageApi.error('Đăng nhập thất bại');
+      messageApi.success(`Đăng nhập thành công: ${data.user.fullName}`);
+      form.resetFields(["password"]);
+      router.push("/");
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        messageApi.error(
+          String((error as { message: unknown }).message) ||
+            "Đăng nhập thất bại",
+        );
+      } else {
+        messageApi.error("Đăng nhập thất bại");
+      }
     }
-  }
-};
+  };
 
   return (
     <>
@@ -50,7 +53,8 @@ export default function LoginForm() {
           <p className="auth-tag">Portfolio CMS</p>
           <h1 className="auth-brand">Võ Tấn Tài</h1>
           <p className="auth-description">
-            Quản lý portfolio, blog, project showcase và nội dung cá nhân trong một dashboard gọn gàng.
+            Quản lý portfolio, blog, project showcase và nội dung cá nhân trong
+            một dashboard gọn gàng.
           </p>
         </section>
 
@@ -62,7 +66,8 @@ export default function LoginForm() {
                 Đăng nhập
               </Title>
               <Paragraph className="auth-subtitle">
-                Đăng nhập để quản lý bài viết, project và hệ thống portfolio của bạn.
+                Đăng nhập để quản lý bài viết, project và hệ thống portfolio của
+                bạn.
               </Paragraph>
             </div>
 
@@ -77,8 +82,8 @@ export default function LoginForm() {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập email' },
-                  { type: 'email', message: 'Email không hợp lệ' },
+                  { required: true, message: "Vui lòng nhập email" },
+                  { type: "email", message: "Email không hợp lệ" },
                 ]}
               >
                 <Input placeholder="tai@example.com" className="auth-input" />
@@ -87,9 +92,12 @@ export default function LoginForm() {
               <Form.Item
                 label="Mật khẩu"
                 name="password"
-                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+                rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
               >
-                <Input.Password placeholder="Nhập mật khẩu" className="auth-input" />
+                <Input.Password
+                  placeholder="Nhập mật khẩu"
+                  className="auth-input"
+                />
               </Form.Item>
 
               <div className="auth-options">
@@ -103,7 +111,12 @@ export default function LoginForm() {
               </div>
 
               <Form.Item className="auth-submit-wrap">
-                <Button type="primary" htmlType="submit" block className="auth-submit">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  className="auth-submit"
+                >
                   Đăng nhập
                 </Button>
               </Form.Item>

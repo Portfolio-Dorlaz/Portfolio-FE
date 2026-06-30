@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useAppDispatch } from '@/redux/hooks';
+import { useEffect } from "react";
+import { useAppDispatch } from "@/redux/hooks";
 import {
   clearAuth,
   getMe,
   handleRefreshToken,
   setBootstrapped,
-} from '@/redux/slices/authSlice';
+} from "@/redux/slices/authSlice";
 
 export default function AuthBootstrap() {
   const dispatch = useAppDispatch();
