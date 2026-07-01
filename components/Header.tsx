@@ -26,7 +26,7 @@ export default function Header() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link href="/" className="site-logo">
-          My Blog
+          MY PORTFOLIO<span>.</span>
         </Link>
 
         <nav className="site-nav">

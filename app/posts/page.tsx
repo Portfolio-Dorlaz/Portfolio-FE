@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/Header";
 import PostCard from "@/components/PostCard";
 import "../../styles/posts-page.css";
 import { Button } from "antd";
