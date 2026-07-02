@@ -4,7 +4,8 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_URL_DEV;
+const API_URL_RENDER = process.env.NEXT_PUBLIC_API_URL_RENDER;
 
 type ApiErrorResponse = {
   message?: string;
@@ -38,7 +39,7 @@ export const clearApiAccessToken = () => {
 };
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_URL_RENDER,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ api.interceptors.response.use(
         if (!refreshPromise) {
           refreshPromise = axios
             .post<RefreshResponse>(
-              `${API_URL}/auth/refresh`,
+              `${API_URL_RENDER}/auth/refresh`,
               {},
               {
                 withCredentials: true,
