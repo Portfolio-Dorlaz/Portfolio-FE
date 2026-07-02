@@ -295,7 +295,8 @@
   min-height: 130px;
 }
 
-.comment-submit-btn {
+.comment-submit-btn,
+.reply-cancel-btn {
   margin-top: 16px;
   border: none;
   border-radius: 999px;
@@ -489,7 +490,8 @@
     align-items: stretch;
   }
 
-  .reply-btn {
+  .reply-btn,
+  .reply-cancel-btn {
     align-self: flex-start;
   }
 

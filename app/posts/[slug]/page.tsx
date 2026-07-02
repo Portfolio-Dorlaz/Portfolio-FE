@@ -7,87 +7,23 @@ import { useSelector } from "react-redux";
 import "../../../styles/post-detail.css";
 import { useAppDispatch } from "@/redux/hooks";
 import { getPostBySlug } from "@/redux/slices/postSlice";
-import { getCommentsByPost } from "@/redux/slices/commentSlice";
+import { createComment, getCommentsByPost } from "@/redux/slices/commentSlice";
 import {
   CommentListSelector,
   LoadingCommentSelector,
   PostDetailSelector,
   PostLoadingSelector,
 } from "@/redux/selector";
+import CommentForm, {
+  type CommentFormValues,
+} from "@/components/comments/CommentForm";
+import CommentItem from "@/components/comments/CommentItem";
 
 type TocItem = {
   id: string;
   text: string;
   level: "h2" | "h3";
 };
-
-type CommentAuthor = {
-  id: string;
-  fullName: string;
-};
-
-type CommentItemType = {
-  id: string;
-  authorId: string;
-  postId: string;
-  parentId: string | null;
-  content: string;
-  createdAt?: string;
-  updatedAt?: string;
-  author?: CommentAuthor;
-  replies?: CommentItemType[];
-};
-
-type CommentItemProps = {
-  comment: CommentItemType;
-  depth?: number;
-};
-
-function CommentItem({ comment, depth = 0 }: CommentItemProps) {
-  const hasReplies =
-    Array.isArray(comment.replies) && comment.replies.length > 0;
-  const isChild = depth > 0;
-
-  return (
-    <article className={`comment-thread ${isChild ? "is-child" : "is-root"}`}>
-      <div className={`comment-card ${isChild ? "reply-card" : "parent-card"}`}>
-        <div className="comment-top">
-          <div className="comment-user">
-            <div className={`comment-avatar ${isChild ? "reply-avatar" : ""}`}>
-              {comment.author?.fullName?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-
-            <div className="comment-user-meta">
-              <strong>{comment.author?.fullName || "Người dùng"}</strong>
-              <span>
-                {comment.createdAt
-                  ? new Date(comment.createdAt).toLocaleString("vi-VN")
-                  : "Vừa xong"}
-              </span>
-            </div>
-          </div>
-
-          <button type="button" className="reply-btn">
-            Trả lời
-          </button>
-        </div>
-
-        <p className="comment-content">{comment.content}</p>
-      </div>
-
-      {hasReplies && (
-        <div className="comment-tree">
-          <div className="comment-tree-line" />
-          <div className="comment-replies">
-            {comment.replies!.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
-            ))}
-          </div>
-        </div>
-      )}
-    </article>
-  );
-}
 
 export default function PostDetailPage() {
   const dispatch = useAppDispatch();
@@ -102,6 +38,9 @@ export default function PostDetailPage() {
 
   const contentRef = useRef<HTMLElement | null>(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
+  const [replyingCommentId, setReplyingCommentId] = useState<string | null>(
+    null,
+  );
 
   const relatedPosts = [
     {
@@ -165,6 +104,57 @@ export default function PostDetailPage() {
 
     setTocItems(items);
   }, [postDetail]);
+
+  const handleSubmitComment = async (
+    values: CommentFormValues,
+  ): Promise<void> => {
+    if (!postDetail?.id) return;
+
+    try {
+      await dispatch(
+        createComment({
+          postId: postDetail.id,
+          content: values.content,
+        }),
+      ).unwrap();
+
+      await dispatch(getCommentsByPost({ postId: postDetail.id })).unwrap();
+    } catch (error) {
+      console.error("Tạo comment thất bại:", error);
+      throw error;
+    }
+  };
+
+  const handleReplyClick = (commentId: string) => {
+    setReplyingCommentId(commentId);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingCommentId(null);
+  };
+
+  const handleSubmitReply = async (
+    commentId: string,
+    values: CommentFormValues,
+  ): Promise<void> => {
+    if (!postDetail?.id) return;
+
+    try {
+      await dispatch(
+        createComment({
+          postId: postDetail.id,
+          content: values.content,
+          parentId: commentId,
+        }),
+      ).unwrap();
+
+      setReplyingCommentId(null);
+      await dispatch(getCommentsByPost({ postId: postDetail.id })).unwrap();
+    } catch (error) {
+      console.error("Tạo reply thất bại:", error);
+      throw error;
+    }
+  };
 
   if (loading) {
     return <main className="post-detail-page">Đang tải bài viết...</main>;
@@ -317,25 +307,26 @@ export default function PostDetailPage() {
           <h2>Bình luận</h2>
         </div>
 
-        <form className="comment-form">
-          <div className="comment-form-row">
-            <input type="text" placeholder="Tên của bạn" />
-            <input type="email" placeholder="Email" />
-          </div>
-
-          <textarea rows={5} placeholder="Viết bình luận của bạn..." />
-
-          <button type="submit" className="comment-submit-btn">
-            Gửi bình luận
-          </button>
-        </form>
+        <CommentForm
+          loading={commentLoading}
+          onSubmit={handleSubmitComment}
+          submitText="Gửi bình luận"
+        />
 
         <div className="comment-list">
           {commentLoading ? (
             <p>Đang tải bình luận...</p>
           ) : commentsData.length > 0 ? (
-            commentsData.map((comment: CommentItemType) => (
-              <CommentItem key={comment.id} comment={comment} />
+            commentsData.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                replyingCommentId={replyingCommentId}
+                onReply={handleReplyClick}
+                onCancelReply={handleCancelReply}
+                onSubmitReply={handleSubmitReply}
+                replyLoading={commentLoading}
+              />
             ))
           ) : (
             <p>Chưa có bình luận nào.</p>
