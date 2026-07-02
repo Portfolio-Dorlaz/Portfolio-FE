@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import "../styles/landing.css";
 import PostCard from "@/components/PostCard";
 
@@ -51,6 +50,7 @@ const skills = [
 const postList = [
   {
     id: "1",
+    slug: "xay-dung-portfolio-cms-voi-nextjs-va-express",
     title: "Xây dựng Portfolio CMS với Next.js và Express",
     excerpt:
       "Một hướng đi gọn cho project CV: frontend public đẹp, backend JWT auth, admin CRUD bài viết.",
@@ -60,6 +60,7 @@ const postList = [
   },
   {
     id: "2",
+    slug: "thiet-ke-landing-page-sang-sach-va-de-doc",
     title: "Thiết kế landing page sáng, sạch và dễ đọc",
     excerpt:
       "Tối ưu phần hero, card bài viết và điều hướng để người dùng xem nội dung ngay cả khi chưa đăng nhập.",
@@ -69,6 +70,7 @@ const postList = [
   },
   {
     id: "3",
+    slug: "jwt-auth-co-ban-cho-blog-cms-ca-nhan",
     title: "JWT auth cơ bản cho blog CMS cá nhân",
     excerpt:
       "Tách rõ public route và admin route để hệ thống đơn giản, dễ debug và phù hợp project portfolio.",
