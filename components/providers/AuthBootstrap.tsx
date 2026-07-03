@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAppDispatch } from "@/redux/hooks";
 import {
   clearAuth,
@@ -9,11 +10,25 @@ import {
   setBootstrapped,
 } from "@/redux/slices/authSlice";
 
+const PUBLIC_AUTH_PATHS = ["/auth/login", "/auth/register"];
+
 export default function AuthBootstrap() {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
 
   useEffect(() => {
     let mounted = true;
+
+    const isPublicAuthPage = PUBLIC_AUTH_PATHS.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    );
+
+    if (isPublicAuthPage) {
+      dispatch(setBootstrapped(true));
+      return () => {
+        mounted = false;
+      };
+    }
 
     const initAuth = async () => {
       try {
@@ -29,6 +44,7 @@ export default function AuthBootstrap() {
       } catch {
         if (!mounted) return;
         dispatch(clearAuth());
+        dispatch(setBootstrapped(true));
       }
     };
 
@@ -37,7 +53,7 @@ export default function AuthBootstrap() {
     return () => {
       mounted = false;
     };
-  }, [dispatch]);
+  }, [dispatch, pathname]);
 
   return null;
 }
