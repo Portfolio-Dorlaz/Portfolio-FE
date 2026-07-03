@@ -1,6 +1,6 @@
 import axios, {
   AxiosError,
-  AxiosRequestConfig,
+  AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
 
@@ -10,25 +10,27 @@ type ApiErrorResponse = {
   message?: string;
 };
 
-type RefreshResponse = {
-  accessToken: string;
-  user?: {
-    id: string;
-    fullName: string;
-    email: string;
-    role: string;
-  };
+type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
 };
 
-type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
+type RefreshResponse = {
+  accessToken: string;
+  user?: User;
+};
+
+export type CustomAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
   skipAuthRefresh?: boolean;
 };
 
 let accessToken: string | null = null;
-let refreshPromise: Promise<RefreshResponse> | null = null;
+let refreshPromise: Promise<string> | null = null;
 
-const AUTH_EXCLUDED_PATHS = [
+const AUTH_BYPASS_PATHS = [
   "/auth/login",
   "/auth/register",
   "/auth/refresh",
@@ -43,6 +45,15 @@ export const getApiAccessToken = () => accessToken;
 
 export const clearApiAccessToken = () => {
   accessToken = null;
+};
+
+const shouldSkipRefresh = (config?: CustomAxiosRequestConfig) => {
+  if (!config) return true;
+
+  if (config.skipAuthRefresh) return true;
+
+  const url = config.url || "";
+  return AUTH_BYPASS_PATHS.some((path) => url.includes(path));
 };
 
 export const api = axios.create({
@@ -60,26 +71,25 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
-  (response) => response.data,
+  (response: AxiosResponse) => response.data,
   async (error: AxiosError<ApiErrorResponse>) => {
-    const originalRequest = error.config as RetryAxiosRequestConfig | undefined;
+    const originalRequest = error.config as CustomAxiosRequestConfig | undefined;
 
     if (!error.response || !originalRequest) {
       return Promise.reject(error);
     }
 
     const status = error.response.status;
-    const requestUrl = originalRequest.url || "";
 
-    const shouldSkipRefresh =
-      !!originalRequest.skipAuthRefresh ||
-      AUTH_EXCLUDED_PATHS.some((path) => requestUrl.includes(path));
-
-    if (status === 401 && !originalRequest._retry && !shouldSkipRefresh) {
+    if (
+      status === 401 &&
+      !originalRequest._retry &&
+      !shouldSkipRefresh(originalRequest)
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -93,18 +103,19 @@ api.interceptors.response.use(
                 headers: {
                   "Content-Type": "application/json",
                 },
-              }
+              },
             )
-            .then((res) => res.data)
+            .then((res) => {
+              const newAccessToken = res.data.accessToken;
+              setApiAccessToken(newAccessToken);
+              return newAccessToken;
+            })
             .finally(() => {
               refreshPromise = null;
             });
         }
 
-        const refreshData = await refreshPromise;
-        const newAccessToken = refreshData.accessToken;
-
-        setApiAccessToken(newAccessToken);
+        const newAccessToken = await refreshPromise;
 
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -122,29 +133,43 @@ api.interceptors.response.use(
       message: error.response.data?.message || "Request failed",
       data: error.response.data,
     });
-  }
+  },
 );
 
-export async function get<T>(url: string, config?: RetryAxiosRequestConfig): Promise<T> {
-  return api.get<T>(url, config).then((res) => res as unknown as T);
+export async function get<T>(
+  url: string,
+  config?: Partial<CustomAxiosRequestConfig>,
+): Promise<T> {
+  return api.get<T>(url, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
 }
 
 export async function post<T>(
   url: string,
   body?: unknown,
-  config?: RetryAxiosRequestConfig
+  config?: Partial<CustomAxiosRequestConfig>,
 ): Promise<T> {
-  return api.post<T>(url, body, config).then((res) => res as unknown as T);
+  return api.post<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
 }
 
 export async function put<T>(
   url: string,
   body?: unknown,
-  config?: RetryAxiosRequestConfig
+  config?: Partial<CustomAxiosRequestConfig>,
 ): Promise<T> {
-  return api.put<T>(url, body, config).then((res) => res as unknown as T);
+  return api.put<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
 }
 
-export async function del<T>(url: string, config?: RetryAxiosRequestConfig): Promise<T> {
-  return api.delete<T>(url, config).then((res) => res as unknown as T);
+export async function patch<T>(
+  url: string,
+  body?: unknown,
+  config?: Partial<CustomAxiosRequestConfig>,
+): Promise<T> {
+  return api.patch<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+}
+
+export async function del<T>(
+  url: string,
+  config?: Partial<CustomAxiosRequestConfig>,
+): Promise<T> {
+  return api.delete<T>(url, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
 }

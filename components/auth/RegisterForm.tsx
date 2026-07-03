@@ -69,7 +69,7 @@ export default function RegisterForm() {
         </section>
 
         <section className="auth-right">
-          <Card className="auth-card" bordered={false}>
+          <Card className="auth-card" variant="borderless">
             <div className="auth-card-header">
               <p className="auth-form-tag">Register</p>
               <Title level={2} className="auth-title">
