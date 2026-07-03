@@ -10,7 +10,7 @@ import {
   setBootstrapped,
 } from "@/redux/slices/authSlice";
 
-const PUBLIC_AUTH_PATHS = ["/auth/login", "/auth/register"];
+const PUBLIC_AUTH_PATHS = ["/login", "/register"];
 
 export default function AuthBootstrap() {
   const dispatch = useAppDispatch();
