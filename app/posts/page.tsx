@@ -11,6 +11,8 @@ import {
   PostLoadingSelector,
   PostErrorSelector,
 } from "@/redux/selector";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function PostsPage() {
   const dispatch = useAppDispatch();
@@ -52,6 +54,7 @@ export default function PostsPage() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_24%),linear-gradient(180deg,#08111f_0%,#0b1526_44%,#0f172a_100%)] text-slate-200">
+      <Header />
       <section className="mx-auto max-w-[1180px] px-6 pb-7 pt-[72px] max-[640px]:px-4">
         <div>
           <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-cyan-300">
@@ -180,6 +183,7 @@ export default function PostsPage() {
           </div>
         </section>
       )}
+      <Footer />
     </main>
   );
 }

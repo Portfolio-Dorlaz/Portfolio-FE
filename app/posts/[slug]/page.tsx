@@ -17,6 +17,8 @@ import CommentForm, {
   type CommentFormValues,
 } from "@/components/comments/CommentForm";
 import CommentItem from "@/components/comments/CommentItem";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 type TocItem = {
   id: string;
@@ -173,6 +175,7 @@ export default function PostDetailPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
+      <Header />
       <section className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_32%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] px-5 pb-10 pt-[72px] max-[768px]:px-4 max-[768px]:pb-7 max-[768px]:pt-14">
         <div className="mx-auto max-w-[860px]">
           <p className="mb-[18px] inline-flex items-center rounded-full bg-[rgba(15,118,110,0.1)] px-3 py-1.5 text-[13px] font-bold uppercase tracking-[0.04em] text-teal-700">
@@ -399,6 +402,7 @@ export default function PostDetailPage() {
           )}
         </div>
       </section>
+      <Footer />
     </main>
   );
 }

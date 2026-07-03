@@ -1,3 +1,5 @@
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import PostCard from "@/components/PostCard";
 
 const featuredProjects = [
@@ -82,6 +84,7 @@ const postList = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_22%),linear-gradient(180deg,#08111f_0%,#0b1526_42%,#0f172a_100%)] text-slate-200">
+      <Header />
       <section className="mx-auto grid max-w-[1180px] grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] items-center gap-8 px-6 pb-16 pt-20 max-[980px]:grid-cols-1 max-[980px]:pt-14 max-[640px]:px-4">
         <div>
           <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-cyan-300">
@@ -259,6 +262,7 @@ export default function HomePage() {
             <PostCard key={post.id} post={post} />
           ))}
         </div>
+        <Footer />
       </section>
     </main>
   );
