@@ -32,6 +32,9 @@ export default function Header() {
         <nav className="site-nav">
           <Link href="/">Trang chủ</Link>
           <Link href="/posts">Bài viết</Link>
+          {isAuthenticated && userInfo?.role === "admin" && (
+            <Link href="/admin">Admin</Link>
+          )}
         </nav>
 
         <div className="site-actions">
