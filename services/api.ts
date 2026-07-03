@@ -2,9 +2,8 @@ import axios, {
   AxiosError,
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
-} from 'axios';
+} from "axios";
 
-// const API_URL = process.env.NEXT_PUBLIC_API_URL_DEV;
 const API_URL_RENDER = process.env.NEXT_PUBLIC_API_URL_RENDER;
 
 type ApiErrorResponse = {
@@ -23,10 +22,18 @@ type RefreshResponse = {
 
 type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
+  skipAuthRefresh?: boolean;
 };
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<RefreshResponse> | null = null;
+
+const AUTH_EXCLUDED_PATHS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh",
+  "/auth/logout",
+];
 
 export const setApiAccessToken = (token: string | null) => {
   accessToken = token;
@@ -42,7 +49,7 @@ export const api = axios.create({
   baseURL: API_URL_RENDER,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -66,9 +73,13 @@ api.interceptors.response.use(
     }
 
     const status = error.response.status;
-    const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+    const requestUrl = originalRequest.url || "";
 
-    if (status === 401 && !originalRequest._retry && !isRefreshRequest) {
+    const shouldSkipRefresh =
+      !!originalRequest.skipAuthRefresh ||
+      AUTH_EXCLUDED_PATHS.some((path) => requestUrl.includes(path));
+
+    if (status === 401 && !originalRequest._retry && !shouldSkipRefresh) {
       originalRequest._retry = true;
 
       try {
@@ -80,7 +91,7 @@ api.interceptors.response.use(
               {
                 withCredentials: true,
                 headers: {
-                  'Content-Type': 'application/json',
+                  "Content-Type": "application/json",
                 },
               }
             )
@@ -99,7 +110,7 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
 
-        return api(originalRequest as AxiosRequestConfig);
+        return api(originalRequest);
       } catch (refreshError) {
         clearApiAccessToken();
         return Promise.reject(refreshError);
@@ -108,24 +119,32 @@ api.interceptors.response.use(
 
     return Promise.reject({
       status,
-      message: error.response.data?.message || 'Request failed',
+      message: error.response.data?.message || "Request failed",
       data: error.response.data,
     });
   }
 );
 
-export async function get<T>(url: string) {
-  return api.get<T>(url).then((res) => res as unknown as T);
+export async function get<T>(url: string, config?: RetryAxiosRequestConfig): Promise<T> {
+  return api.get<T>(url, config).then((res) => res as unknown as T);
 }
 
-export async function post<T>(url: string, body?: unknown) {
-  return api.post<T>(url, body).then((res) => res as unknown as T);
+export async function post<T>(
+  url: string,
+  body?: unknown,
+  config?: RetryAxiosRequestConfig
+): Promise<T> {
+  return api.post<T>(url, body, config).then((res) => res as unknown as T);
 }
 
-export async function put<T>(url: string, body?: unknown): Promise<T> {
-  return api.put<T>(url, body).then((res) => res as unknown as T);
+export async function put<T>(
+  url: string,
+  body?: unknown,
+  config?: RetryAxiosRequestConfig
+): Promise<T> {
+  return api.put<T>(url, body, config).then((res) => res as unknown as T);
 }
 
-export async function del<T>(url: string) {
-  return api.delete<T>(url).then((res) => res as unknown as T);
+export async function del<T>(url: string, config?: RetryAxiosRequestConfig): Promise<T> {
+  return api.delete<T>(url, config).then((res) => res as unknown as T);
 }
