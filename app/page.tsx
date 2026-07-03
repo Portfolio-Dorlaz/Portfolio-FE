@@ -54,7 +54,7 @@ const postList = [
     excerpt:
       "Một hướng đi gọn cho project CV: frontend public đẹp, backend JWT auth, admin CRUD bài viết.",
     category: "Development",
-    date: "28 Jun 2026",
+    createdAt: "28 Jun 2026",
     readTime: "6 min read",
   },
   {
@@ -64,7 +64,7 @@ const postList = [
     excerpt:
       "Tối ưu phần hero, card bài viết và điều hướng để người dùng xem nội dung ngay cả khi chưa đăng nhập.",
     category: "UI/UX",
-    date: "27 Jun 2026",
+    createdAt: "27 Jun 2026",
     readTime: "4 min read",
   },
   {
@@ -74,84 +74,127 @@ const postList = [
     excerpt:
       "Tách rõ public route và admin route để hệ thống đơn giản, dễ debug và phù hợp project portfolio.",
     category: "Backend",
-    date: "26 Jun 2026",
+    createdAt: "26 Jun 2026",
     readTime: "7 min read",
   },
 ];
 
 export default function HomePage() {
   return (
-    <main className="landing-page">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <p className="hero-tag">Game Dev × Web Dev</p>
-          <h1>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_22%),linear-gradient(180deg,#08111f_0%,#0b1526_42%,#0f172a_100%)] text-slate-200">
+      <section className="mx-auto grid max-w-[1180px] grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] items-center gap-8 px-6 pb-16 pt-20 max-[980px]:grid-cols-1 max-[980px]:pt-14 max-[640px]:px-4">
+        <div>
+          <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-cyan-300">
+            Game Dev × Web Dev
+          </p>
+
+          <h1 className="max-w-[11ch] text-[clamp(2.8rem,6vw,5.6rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-slate-50 max-[980px]:max-w-[12ch] max-[640px]:text-[clamp(2.3rem,12vw,3.6rem)]">
             Võ Tấn Tài builds playable systems and polished web experiences.
           </h1>
-          <p className="hero-text">
+
+          <p className="mt-6 max-w-[62ch] text-[16px] leading-[1.9] text-slate-400">
             Tôi phát triển gameplay prototypes, gameplay systems và các sản phẩm
             web full-stack với trọng tâm vào trải nghiệm, hiệu năng và cấu trúc
             sạch.
           </p>
 
-          <div className="hero-actions">
-            <a href="#featured" className="btn btn-primary">
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#featured"
+              className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(135deg,#22d3ee_0%,#2563eb_100%)] px-5 py-3 text-sm font-bold text-white no-underline shadow-[0_16px_30px_rgba(37,99,235,0.22)] transition duration-200 hover:-translate-y-[1px] hover:opacity-95"
+            >
               Xem project nổi bật
             </a>
-            <a href="#writing" className="btn btn-outline">
+            <a
+              href="#writing"
+              className="inline-flex items-center justify-center rounded-full border border-[rgba(148,163,184,0.18)] bg-[rgba(15,23,42,0.72)] px-5 py-3 text-sm font-bold text-slate-100 no-underline transition duration-200 hover:border-[rgba(103,232,249,0.2)] hover:bg-[rgba(34,211,238,0.08)]"
+            >
               Đọc bài viết
             </a>
           </div>
         </div>
 
-        <div className="hero-highlight">
-          <div className="hero-panel-card status-card">
-            <span className="hero-chip">Now building</span>
-            <h3>Portfolio CMS, gameplay prototypes, admin systems</h3>
-            <p>
+        <div className="grid gap-4">
+          <div className="rounded-[28px] border border-[rgba(148,163,184,0.14)] bg-[linear-gradient(180deg,rgba(15,23,42,0.92)_0%,rgba(17,24,39,0.98)_100%)] p-6 shadow-[0_22px_60px_rgba(2,6,23,0.26)]">
+            <span className="mb-4 inline-flex rounded-full bg-[rgba(34,211,238,0.12)] px-3 py-1 text-[12px] font-bold uppercase tracking-[0.08em] text-cyan-300">
+              Now building
+            </span>
+            <h3 className="mb-3 text-[1.6rem] leading-[1.25] text-slate-50">
+              Portfolio CMS, gameplay prototypes, admin systems
+            </h3>
+            <p className="m-0 leading-[1.8] text-slate-400">
               Kết hợp tư duy sản phẩm web với cách tiếp cận hệ thống của game
               development.
             </p>
           </div>
 
-          <div className="meta-grid">
-            <div className="meta-card">
-              <strong>Focus</strong>
-              <span>Gameplay, Tools, Full-stack</span>
+          <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
+            <div className="rounded-[24px] border border-[rgba(148,163,184,0.14)] bg-[rgba(15,23,42,0.82)] p-5 shadow-[0_14px_34px_rgba(2,6,23,0.18)]">
+              <strong className="mb-2 block text-sm uppercase tracking-[0.08em] text-slate-300">
+                Focus
+              </strong>
+              <span className="text-sm leading-[1.7] text-slate-400">
+                Gameplay, Tools, Full-stack
+              </span>
             </div>
-            <div className="meta-card">
-              <strong>Stack</strong>
-              <span>Next.js, Express, PostgreSQL, UI Systems</span>
+
+            <div className="rounded-[24px] border border-[rgba(148,163,184,0.14)] bg-[rgba(15,23,42,0.82)] p-5 shadow-[0_14px_34px_rgba(2,6,23,0.18)]">
+              <strong className="mb-2 block text-sm uppercase tracking-[0.08em] text-slate-300">
+                Stack
+              </strong>
+              <span className="text-sm leading-[1.7] text-slate-400">
+                Next.js, Express, PostgreSQL, UI Systems
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="featured" className="featured-section">
-        <div className="section-head">
+      <section
+        id="featured"
+        className="mx-auto max-w-[1180px] px-6 py-14 max-[640px]:px-4"
+      >
+        <div className="mb-8 flex items-end justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start">
           <div>
-            <p className="section-tag">Featured work</p>
-            <h2>Project nổi bật</h2>
+            <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-cyan-300">
+              Featured work
+            </p>
+            <h2 className="text-[2.1rem] tracking-[-0.03em] text-slate-50">
+              Project nổi bật
+            </h2>
           </div>
-          <p className="section-description">
+          <p className="max-w-[56ch] text-slate-400 leading-[1.8]">
             Một vài hướng build thể hiện cách tôi kết hợp tư duy gameplay, hệ
             thống và sản phẩm web.
           </p>
         </div>
 
-        <div className="featured-grid">
+        <div className="grid grid-cols-2 gap-5 max-[980px]:grid-cols-1">
           {featuredProjects.map((project, index) => (
             <article
               key={project.id}
-              className={`featured-card ${index === 0 ? "featured-card-large" : ""}`}
+              className={`rounded-[28px] border border-[rgba(148,163,184,0.14)] bg-[linear-gradient(180deg,rgba(15,23,42,0.92)_0%,rgba(17,24,39,0.96)_100%)] p-6 shadow-[0_18px_40px_rgba(2,6,23,0.18)] transition duration-300 hover:-translate-y-[4px] hover:border-[rgba(103,232,249,0.22)] hover:shadow-[0_24px_56px_rgba(2,6,23,0.26)] ${
+                index === 0 ? "md:col-span-2" : ""
+              }`}
             >
-              <span className="featured-status">{project.status}</span>
-              <h3>{project.title}</h3>
-              <p>{project.description}</p>
+              <span className="mb-4 inline-flex rounded-full bg-[rgba(34,211,238,0.12)] px-3 py-1 text-[12px] font-bold uppercase tracking-[0.08em] text-cyan-300">
+                {project.status}
+              </span>
 
-              <div className="featured-stack">
+              <h3 className="mb-3 text-[1.55rem] leading-[1.3] text-slate-50">
+                {project.title}
+              </h3>
+
+              <p className="mb-5 max-w-[62ch] leading-[1.8] text-slate-400">
+                {project.description}
+              </p>
+
+              <div className="flex flex-wrap gap-2.5">
                 {project.stack.map((item) => (
-                  <span key={item} className="stack-chip">
+                  <span
+                    key={item}
+                    className="inline-flex rounded-full border border-[rgba(148,163,184,0.14)] bg-[rgba(15,23,42,0.8)] px-3 py-1.5 text-[12px] font-semibold text-slate-300"
+                  >
                     {item}
                   </span>
                 ))}
@@ -161,41 +204,57 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="skills-section">
-        <div className="section-head">
+      <section className="mx-auto max-w-[1180px] px-6 py-14 max-[640px]:px-4">
+        <div className="mb-8 flex items-end justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start">
           <div>
-            <p className="section-tag">What I do</p>
-            <h2>Năng lực chính</h2>
+            <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-cyan-300">
+              What I do
+            </p>
+            <h2 className="text-[2.1rem] tracking-[-0.03em] text-slate-50">
+              Năng lực chính
+            </h2>
           </div>
-          <p className="section-description">
+          <p className="max-w-[56ch] text-slate-400 leading-[1.8]">
             Tập trung vào interactive systems, công cụ quản trị và giao diện có
             cấu trúc rõ ràng.
           </p>
         </div>
 
-        <div className="skills-grid">
+        <div className="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
           {skills.map((skill) => (
-            <article key={skill.title} className="skill-card">
-              <h3>{skill.title}</h3>
-              <p>{skill.text}</p>
+            <article
+              key={skill.title}
+              className="rounded-[24px] border border-[rgba(148,163,184,0.14)] bg-[rgba(15,23,42,0.82)] p-6 shadow-[0_16px_34px_rgba(2,6,23,0.15)]"
+            >
+              <h3 className="mb-3 text-[1.3rem] text-slate-50">
+                {skill.title}
+              </h3>
+              <p className="leading-[1.8] text-slate-400">{skill.text}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section id="writing" className="posts-section">
-        <div className="section-head">
+      <section
+        id="writing"
+        className="mx-auto max-w-[1180px] px-6 pb-20 pt-14 max-[640px]:px-4"
+      >
+        <div className="mb-8 flex items-end justify-between gap-6 max-[900px]:flex-col max-[900px]:items-start">
           <div>
-            <p className="section-tag">Writing</p>
-            <h2>Ghi chú và bài viết</h2>
+            <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-cyan-300">
+              Writing
+            </p>
+            <h2 className="text-[2.1rem] tracking-[-0.03em] text-slate-50">
+              Ghi chú và bài viết
+            </h2>
           </div>
-          <p className="section-description">
+          <p className="max-w-[56ch] text-slate-400 leading-[1.8]">
             Các ghi chú ngắn về frontend, backend, auth flow và cách tổ chức một
             portfolio CMS gọn.
           </p>
         </div>
 
-        <div className="posts-grid">
+        <div className="grid grid-cols-3 gap-5 max-[1080px]:grid-cols-2 max-[768px]:grid-cols-1">
           {postList.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
