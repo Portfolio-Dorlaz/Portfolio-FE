@@ -1,4 +1,3 @@
-import "../styles/landing.css";
 import PostCard from "@/components/PostCard";
 
 const featuredProjects = [
