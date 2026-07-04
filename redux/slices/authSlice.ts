@@ -245,11 +245,14 @@ export const authSlice = createSlice({
         state.isAuthenticated = true;
         state.bootstrapped = true;
       })
-      .addCase(getMe.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || { message: 'Lấy thông tin user thất bại' };
-        state.userInfo = null;
-      })
+       .addCase(getMe.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload || { message: 'Lấy thông tin user thất bại' };
+  state.userInfo = null;
+  state.accessToken = null;
+  state.isAuthenticated = false;
+  state.bootstrapped = true;
+})
 
       .addCase(handleLogout.pending, (state) => {
         state.loading = true;

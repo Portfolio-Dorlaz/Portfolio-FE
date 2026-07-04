@@ -15,10 +15,11 @@ export default function Header() {
   const onLogout = async () => {
     try {
       await dispatch(handleLogout()).unwrap();
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
+    } catch (e) {
+      console.log(e);
     }
+
+    router.push("/login");
   };
 
   return (
