@@ -47,36 +47,62 @@ export default function LoginForm() {
     <>
       {contextHolder}
 
-      <main className="grid min-h-screen items-center gap-8 bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)] px-8 py-8 [background-image:radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_30%),linear-gradient(180deg,#0f172a_0%,#020617_100%)] lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,460px)] max-[900px]:grid-cols-1 max-[900px]:px-5 max-[900px]:py-5">
-        <section className="px-8 text-slate-200 max-[900px]:px-1">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-sky-400">
-            Portfolio CMS
+      <main className="grid min-h-screen items-center gap-10 overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] px-6 py-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,460px)] lg:px-10">
+        <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.14),transparent_26%)]" />
+
+        <section className="relative z-10 px-1 text-slate-900 lg:px-6">
+          <p className="mb-3 inline-flex rounded-full border border-blue-200 bg-white/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-700 backdrop-blur">
+            Community account
           </p>
-          <h1 className="mb-4 text-[clamp(2.5rem,5vw,4.75rem)] leading-[1.05] text-slate-50">
-            Võ Tấn Tài
+
+          <h1 className="mb-4 max-w-[9ch] text-[clamp(2.6rem,5vw,4.8rem)] font-semibold leading-[1.02] text-slate-900">
+            Join the conversation.
           </h1>
-          <p className="text-base leading-[1.7] text-slate-400">
-            Quản lý portfolio, blog, project showcase và nội dung cá nhân trong
-            một dashboard gọn gàng.
+
+          <p className="max-w-[560px] text-base leading-8 text-slate-600">
+            Đăng nhập để bình luận và tương tác trong portfolio. Tài khoản này
+            không có quyền tạo, chỉnh sửa hoặc quản lý bài viết trong CMS.
           </p>
+
+          <div className="mt-10 grid max-w-[560px] gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-white/70 bg-white/75 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Projects
+              </p>
+              <p className="mt-2 text-2xl font-bold text-slate-900">12+</p>
+            </div>
+
+            <div className="rounded-3xl border border-white/70 bg-white/75 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Posts
+              </p>
+              <p className="mt-2 text-2xl font-bold text-slate-900">24</p>
+            </div>
+
+            <div className="rounded-3xl border border-white/70 bg-white/75 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Studio Flow
+              </p>
+              <p className="mt-2 text-2xl font-bold text-slate-900">Smooth</p>
+            </div>
+          </div>
         </section>
 
-        <section className="flex justify-center">
+        <section className="relative z-10 flex justify-center">
           <Card
             variant="borderless"
-            className="w-full rounded-[28px] border border-[rgba(148,163,184,0.12)] bg-[rgba(15,23,42,0.92)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+            className="w-full rounded-[24px] border border-white/80 bg-white/92 shadow-[0_24px_80px_rgba(37,99,235,0.10)] backdrop-blur"
             styles={{ body: { padding: 32 } }}
           >
             <div className="mb-6">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-sky-400">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-blue-600">
                 Welcome back
               </p>
-              <Title level={2} className="!mb-3 !text-slate-50">
+              <Title level={2} className="!mb-2 !text-slate-900">
                 Đăng nhập
               </Title>
-              <Paragraph className="!mb-0 !text-base !leading-[1.7] !text-slate-400">
-                Đăng nhập để quản lý bài viết, project và hệ thống portfolio của
-                bạn.
+              <Paragraph className="!mb-0 !text-base !leading-7 !text-slate-600">
+                Đăng nhập để tham gia bình luận trong portfolio.
               </Paragraph>
             </div>
 
@@ -88,7 +114,9 @@ export default function LoginForm() {
               requiredMark={false}
             >
               <Form.Item
-                label={<span className="text-slate-300">Email</span>}
+                label={
+                  <span className="font-medium text-slate-700">Email</span>
+                }
                 name="email"
                 rules={[
                   { required: true, message: "Vui lòng nhập email" },
@@ -97,29 +125,34 @@ export default function LoginForm() {
               >
                 <Input
                   placeholder="tai@example.com"
-                  className="!rounded-2xl !border-[rgba(148,163,184,0.16)] !bg-[#0b1120] !px-3 !py-3 !text-slate-200 placeholder:!text-slate-500 hover:!border-slate-500 focus:!border-sky-400 focus:!shadow-[0_0_0_3px_rgba(56,189,248,0.12)]"
+                  className="!h-12 !rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !text-slate-900 placeholder:!text-slate-400 hover:!border-blue-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
                 />
               </Form.Item>
 
               <Form.Item
-                label={<span className="text-slate-300">Mật khẩu</span>}
+                label={
+                  <span className="font-medium text-slate-700">Mật khẩu</span>
+                }
                 name="password"
                 rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
               >
                 <Input.Password
                   placeholder="Nhập mật khẩu"
-                  className="!rounded-2xl !border-[rgba(148,163,184,0.16)] !bg-[#0b1120] !px-3 !py-3 !text-slate-200 placeholder:!text-slate-500 hover:!border-slate-500 focus:!border-sky-400 focus:!shadow-[0_0_0_3px_rgba(56,189,248,0.12)]"
+                  className="!h-12 !rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !text-slate-900 placeholder:!text-slate-400 hover:!border-blue-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
                 />
               </Form.Item>
 
               <div className="mb-6 flex items-center justify-between gap-4">
                 <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox className="text-slate-200">
+                  <Checkbox className="text-slate-700">
                     Ghi nhớ đăng nhập
                   </Checkbox>
                 </Form.Item>
 
-                <a href="#" className="text-sm text-sky-300 no-underline">
+                <a
+                  href="#"
+                  className="text-sm font-medium text-blue-600 no-underline hover:text-blue-700"
+                >
                   Quên mật khẩu?
                 </a>
               </div>
@@ -129,7 +162,7 @@ export default function LoginForm() {
                   type="primary"
                   htmlType="submit"
                   block
-                  className="!h-12 !rounded-2xl !border-none !bg-sky-400 !font-bold !text-sky-950 !shadow-none hover:!bg-sky-300 hover:!text-sky-950"
+                  className="!h-12 !rounded-2xl !border-none !bg-blue-600 !font-bold !text-white !shadow-[0_10px_24px_rgba(37,99,235,0.22)] hover:!bg-blue-700 hover:!text-white"
                 >
                   Đăng nhập
                 </Button>

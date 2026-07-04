@@ -52,17 +52,19 @@ export default function CommentItem({
   return (
     <article className="flex flex-col gap-3">
       <div
-        className={`rounded-[22px] border p-4 shadow-[0_10px_28px_rgba(15,23,42,0.04)] ${
-          isChild ? "bg-slate-50 border-slate-200" : "bg-white border-slate-200"
+        className={`rounded-[22px] border p-4 shadow-[0_10px_28px_rgba(37,99,235,0.05)] ${
+          isChild
+            ? "border-slate-200 bg-slate-50/90"
+            : "border-white/80 bg-white/92"
         }`}
       >
         <div className="mb-2.5 flex items-start justify-between gap-4 max-[768px]:flex-col max-[768px]:items-stretch">
           <div className="flex items-center gap-3">
             <div
-              className={`flex shrink-0 items-center justify-center rounded-full text-white font-bold ${
+              className={`flex shrink-0 items-center justify-center rounded-full font-bold text-white ${
                 isChild
-                  ? "h-[36px] w-[36px] bg-[linear-gradient(135deg,#475569,#64748b)] text-[13px]"
-                  : "h-11 w-11 bg-[linear-gradient(135deg,#0f766e,#14b8a6)] text-[15px]"
+                  ? "h-[36px] w-[36px] bg-slate-400 text-[13px]"
+                  : "h-11 w-11 bg-blue-600 text-[15px]"
               }`}
             >
               {comment.author?.fullName?.charAt(0)?.toUpperCase() || "U"}
@@ -82,7 +84,7 @@ export default function CommentItem({
 
           <button
             type="button"
-            className="self-start bg-transparent p-0 text-sm font-bold text-teal-700 transition-opacity hover:opacity-80"
+            className="self-start rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
             onClick={() => onReply(comment.id)}
           >
             Trả lời
@@ -95,7 +97,7 @@ export default function CommentItem({
       </div>
 
       {isReplying && (
-        <div className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
+        <div className="rounded-[22px] border border-white/80 bg-white/92 p-4 shadow-[0_10px_28px_rgba(37,99,235,0.05)]">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-slate-600">
               Đang trả lời{" "}
@@ -105,7 +107,7 @@ export default function CommentItem({
             </span>
             <button
               type="button"
-              className="rounded-full bg-[linear-gradient(135deg,#0f766e,#14b8a6)] px-4 py-2 text-sm font-bold text-white shadow-[0_14px_24px_rgba(20,184,166,0.2)] transition hover:-translate-y-[1px] hover:opacity-95"
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.04)] transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               onClick={onCancelReply}
             >
               Hủy
@@ -125,7 +127,7 @@ export default function CommentItem({
 
       {hasReplies && (
         <div className="ml-[18px] flex gap-[14px] max-[768px]:ml-[10px] max-[768px]:gap-[10px]">
-          <div className="w-[2px] shrink-0 rounded-full bg-[linear-gradient(180deg,#cbd5e1_0%,#e2e8f0_100%)]" />
+          <div className="w-[2px] shrink-0 rounded-full bg-[linear-gradient(180deg,#bfdbfe_0%,#dbeafe_100%)]" />
           <div className="flex-1 space-y-3">
             {comment.replies!.map((reply) => (
               <CommentItem

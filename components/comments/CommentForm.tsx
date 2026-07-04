@@ -49,7 +49,7 @@ export default function CommentForm({
   };
 
   return (
-    <div className="rounded-[24px] border border-slate-200 bg-white p-[22px] shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+    <div className="rounded-[24px] border border-white/80 bg-white/92 p-[22px] shadow-[0_14px_34px_rgba(37,99,235,0.06)] backdrop-blur">
       <Form<CommentFormValues>
         form={form}
         layout="vertical"
@@ -59,7 +59,9 @@ export default function CommentForm({
         {showAuthorFields && (
           <div className="mb-[14px] grid grid-cols-2 gap-[14px] max-[768px]:grid-cols-1">
             <Form.Item
-              label={<span className="text-slate-700">Tên của bạn</span>}
+              label={
+                <span className="font-medium text-slate-700">Tên của bạn</span>
+              }
               name="fullName"
               rules={[
                 { required: true, message: "Vui lòng nhập tên của bạn" },
@@ -69,12 +71,12 @@ export default function CommentForm({
               <Input
                 placeholder="Nhập tên của bạn"
                 size="large"
-                className="!rounded-2xl !border-[#dbe4ea] !bg-slate-50 !px-4 !py-3 !text-slate-900 hover:!border-slate-300 focus:!border-teal-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(20,184,166,0.12)]"
+                className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-slate-900 placeholder:!text-slate-400 hover:!border-slate-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
               />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-slate-700">Email</span>}
+              label={<span className="font-medium text-slate-700">Email</span>}
               name="email"
               rules={[
                 { required: true, message: "Vui lòng nhập email" },
@@ -84,14 +86,18 @@ export default function CommentForm({
               <Input
                 placeholder="Nhập email của bạn"
                 size="large"
-                className="!rounded-2xl !border-[#dbe4ea] !bg-slate-50 !px-4 !py-3 !text-slate-900 hover:!border-slate-300 focus:!border-teal-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(20,184,166,0.12)]"
+                className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-slate-900 placeholder:!text-slate-400 hover:!border-slate-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
               />
             </Form.Item>
           </div>
         )}
 
         <Form.Item
-          label={<span className="text-slate-700">Nội dung bình luận</span>}
+          label={
+            <span className="font-medium text-slate-700">
+              Nội dung bình luận
+            </span>
+          }
           name="content"
           rules={[
             { required: true, message: "Vui lòng nhập nội dung bình luận" },
@@ -103,7 +109,7 @@ export default function CommentForm({
             placeholder="Viết bình luận của bạn..."
             maxLength={1000}
             showCount
-            className="!rounded-2xl !border-[#dbe4ea] !bg-slate-50 !px-4 !py-3 !text-slate-900 hover:!border-slate-300 focus:!border-teal-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(20,184,166,0.12)]"
+            className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-slate-900 placeholder:!text-slate-400 hover:!border-slate-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
           />
         </Form.Item>
 
@@ -113,7 +119,7 @@ export default function CommentForm({
             htmlType="submit"
             loading={loading}
             size="large"
-            className="!mt-0 !inline-flex !h-auto !items-center !justify-center !rounded-full !border-0 !bg-[linear-gradient(135deg,#0f766e,#14b8a6)] !px-5 !py-3 !text-sm !font-bold !text-white !shadow-[0_14px_24px_rgba(20,184,166,0.2)] hover:!translate-y-[-1px] hover:!opacity-95"
+            className="!mt-0 !inline-flex !h-auto !items-center !justify-center !rounded-full !border-0 !bg-blue-600 !px-5 !py-3 !text-sm !font-bold !text-white !shadow-[0_14px_24px_rgba(37,99,235,0.18)] hover:!translate-y-[-1px] hover:!bg-blue-700"
           >
             {submitText}
           </Button>

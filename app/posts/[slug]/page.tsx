@@ -17,8 +17,6 @@ import CommentForm, {
   type CommentFormValues,
 } from "@/components/comments/CommentForm";
 import CommentItem from "@/components/comments/CommentItem";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 type TocItem = {
   id: string;
@@ -159,7 +157,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900">
+      <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] px-4 py-10 text-slate-900">
         Đang tải bài viết...
       </main>
     );
@@ -167,18 +165,18 @@ export default function PostDetailPage() {
 
   if (!postDetail) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900">
+      <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] px-4 py-10 text-slate-900">
         Không tìm thấy bài viết.
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <Header />
-      <section className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_32%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] px-5 pb-10 pt-[72px] max-[768px]:px-4 max-[768px]:pb-7 max-[768px]:pt-14">
+    <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] text-slate-900">
+      <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.08),transparent_24%)]" />
+      <section className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] px-5 pb-10 pt-[72px] max-[768px]:px-4 max-[768px]:pb-7 max-[768px]:pt-14">
         <div className="mx-auto max-w-[860px]">
-          <p className="mb-[18px] inline-flex items-center rounded-full bg-[rgba(15,118,110,0.1)] px-3 py-1.5 text-[13px] font-bold uppercase tracking-[0.04em] text-teal-700">
+          <p className="mb-[18px] inline-flex items-center rounded-full bg-blue-50 px-3 py-1.5 text-[13px] font-bold uppercase tracking-[0.04em] text-blue-700">
             {postDetail.category}
           </p>
           <h1 className="m-0 text-[clamp(34px,5vw,58px)] leading-[1.08] tracking-[-0.03em] text-slate-900">
@@ -201,9 +199,9 @@ export default function PostDetailPage() {
         </div>
       </section>
 
-      <section className="sticky top-0 z-20 border-b border-slate-200 bg-[rgba(248,250,252,0.9)] backdrop-blur-[10px]">
+      <section className="sticky top-0 z-20 border-b border-slate-200 bg-[rgba(255,255,255,0.86)] backdrop-blur-[10px]">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-5 px-5 py-[14px] max-[768px]:px-4">
-          <p className="m-0 text-xs font-bold uppercase tracking-[0.08em] text-teal-700">
+          <p className="m-0 text-xs font-bold uppercase tracking-[0.08em] text-blue-700">
             On this page
           </p>
           <nav className="flex flex-wrap gap-x-[18px] gap-y-2">
@@ -212,7 +210,7 @@ export default function PostDetailPage() {
                 <a
                   key={item.id}
                   href={`#${item.id}`}
-                  className={`text-sm no-underline transition-colors hover:text-teal-700 ${
+                  className={`text-sm no-underline transition-colors hover:text-blue-700 ${
                     item.level === "h3"
                       ? "text-[13px] text-slate-500"
                       : "text-slate-600"
@@ -225,19 +223,19 @@ export default function PostDetailPage() {
               <>
                 <a
                   href="#content"
-                  className="text-sm text-slate-600 no-underline transition-colors hover:text-teal-700"
+                  className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
                 >
                   Nội dung
                 </a>
                 <a
                   href="#comments"
-                  className="text-sm text-slate-600 no-underline transition-colors hover:text-teal-700"
+                  className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
                 >
                   Bình luận
                 </a>
                 <a
                   href="#related"
-                  className="text-sm text-slate-600 no-underline transition-colors hover:text-teal-700"
+                  className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
                 >
                   Liên quan
                 </a>
@@ -249,7 +247,7 @@ export default function PostDetailPage() {
 
       <section className="mx-auto grid max-w-[1320px] grid-cols-[260px_minmax(0,1fr)_260px] gap-6 px-5 pb-0 pt-8 max-[1180px]:grid-cols-1 max-[768px]:px-4">
         <aside className="sticky top-[92px] self-start max-[1180px]:hidden">
-          <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+          <div className="overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
             <img
               src="https://picsum.photos/seed/cms-left/420/720"
               alt="Workspace and planning notes for CMS architecture"
@@ -259,7 +257,7 @@ export default function PostDetailPage() {
         </aside>
 
         <article
-          className="rounded-[28px] border border-slate-200 bg-white p-10 shadow-[0_14px_40px_rgba(15,23,42,0.05)] max-[1180px]:p-8 max-[768px]:rounded-[22px] max-[768px]:p-6"
+          className="rounded-[28px] border border-white/80 bg-white/95 p-10 shadow-[0_18px_50px_rgba(37,99,235,0.06)] max-[1180px]:p-8 max-[768px]:rounded-[22px] max-[768px]:p-6"
           id="content"
           ref={contentRef}
         >
@@ -326,7 +324,7 @@ export default function PostDetailPage() {
         </article>
 
         <aside className="sticky top-[92px] self-start max-[1180px]:hidden">
-          <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+          <div className="overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
             <img
               src="https://picsum.photos/seed/cms-right/420/720"
               alt="Developer desk with code editor and system diagrams"
@@ -341,7 +339,7 @@ export default function PostDetailPage() {
         id="related"
       >
         <div className="mb-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-teal-700">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-blue-700">
             Continue reading
           </p>
           <h2 className="m-0 text-[30px] text-slate-900">Bài viết liên quan</h2>
@@ -352,9 +350,9 @@ export default function PostDetailPage() {
             <Link
               key={item.id}
               href={`/posts/${item.slug}`}
-              className="block rounded-[22px] border border-slate-200 bg-white p-[22px] no-underline shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-[3px] hover:border-teal-200 hover:shadow-[0_18px_36px_rgba(15,23,42,0.08)]"
+              className="block rounded-[22px] border border-white/80 bg-white/92 p-[22px] no-underline shadow-[0_10px_30px_rgba(37,99,235,0.06)] transition duration-200 hover:-translate-y-[3px] hover:border-blue-200 hover:shadow-[0_18px_36px_rgba(37,99,235,0.1)]"
             >
-              <span className="mb-[10px] inline-block text-[13px] font-bold text-teal-700">
+              <span className="mb-[10px] inline-block text-[13px] font-bold text-blue-700">
                 {item.category}
               </span>
               <h3 className="m-0 text-[19px] leading-[1.5] text-slate-900">
@@ -370,7 +368,7 @@ export default function PostDetailPage() {
         id="comments"
       >
         <div className="mb-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-teal-700">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-blue-700">
             Discussion
           </p>
           <h2 className="m-0 text-[30px] text-slate-900">Bình luận</h2>
@@ -384,7 +382,7 @@ export default function PostDetailPage() {
 
         <div className="mt-7 flex flex-col gap-[22px]">
           {commentLoading ? (
-            <p>Đang tải bình luận...</p>
+            <p className="text-slate-600">Đang tải bình luận...</p>
           ) : commentsData.length > 0 ? (
             commentsData.map((comment) => (
               <CommentItem
@@ -398,11 +396,10 @@ export default function PostDetailPage() {
               />
             ))
           ) : (
-            <p>Chưa có bình luận nào.</p>
+            <p className="text-slate-600">Chưa có bình luận nào.</p>
           )}
         </div>
       </section>
-      <Footer />
     </main>
   );
 }

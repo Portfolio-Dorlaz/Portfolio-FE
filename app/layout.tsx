@@ -21,7 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <AntdRegistry>
           <ReduxProvider>
             <div className="flex min-h-screen flex-col">
+              <Header />
               <div className="flex-1">{children}</div>
+              <Footer />
             </div>
           </ReduxProvider>
         </AntdRegistry>
