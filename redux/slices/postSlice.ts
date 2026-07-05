@@ -81,9 +81,6 @@ export const createPost = createAsyncThunk<
   try {
     const data = await post<CreatePostResponse>("/posts", payload, {
       withCredentials: true,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
     });
 
     return data;
