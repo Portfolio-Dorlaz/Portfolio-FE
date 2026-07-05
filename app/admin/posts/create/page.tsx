@@ -27,6 +27,10 @@ type CreatePostValues = {
   isPublished: boolean;
 };
 
+type RejectedError = {
+  message?: string;
+};
+
 export default function CreatePostPage() {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(PostLoadingSelector);
@@ -119,12 +123,12 @@ export default function CreatePostPage() {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("slug", values.slug);
-      formData.append("excerpt", values.excerpt);
+      formData.append("excerpt", values.excerpt || "");
       formData.append("content", values.content);
       formData.append("category", values.category);
       formData.append("isPublished", String(values.isPublished));
 
-      if (imageFile) {
+      if (imageFile instanceof File) {
         formData.append("image", imageFile);
       }
 
@@ -135,13 +139,15 @@ export default function CreatePostPage() {
       handleRemoveImage();
       dispatch(clearPostState());
     } catch (error) {
-      console.error(error);
-      message.error("Không thể tạo bài viết");
+      const err = error as RejectedError;
+      console.error("create post error:", err);
+      message.error(err?.message || "Không thể tạo bài viết");
     }
   };
 
   return (
     <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] text-slate-900">
+      <Header />
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.10),transparent_22%)]" />
       <section className="mx-auto max-w-[1180px] px-6 pb-8 pt-[72px] max-[640px]:px-4">
         <div className="rounded-[28px] border border-white/80 bg-white/80 px-8 py-8 shadow-[0_24px_80px_rgba(37,99,235,0.08)] backdrop-blur max-[640px]:px-5">
@@ -179,7 +185,7 @@ export default function CreatePostPage() {
                 slug: "",
                 excerpt: "",
                 content: "",
-                category: "Development",
+                category: "Game Development",
                 isPublished: false,
               }}
               onFinish={handleSubmit}
@@ -405,6 +411,7 @@ export default function CreatePostPage() {
           </aside>
         </div>
       </section>
+      <Footer />
     </main>
   );
 }
