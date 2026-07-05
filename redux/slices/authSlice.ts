@@ -1,6 +1,11 @@
-import axios from 'axios';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { clearApiAccessToken, get, post, setApiAccessToken } from '../../services/api';
+import axios from "axios";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  clearApiAccessToken,
+  get,
+  post,
+  setApiAccessToken,
+} from "../../services/api";
 
 type LoginPayload = {
   email: string;
@@ -58,7 +63,7 @@ const getErrorPayload = (error: unknown, fallback: string): ApiError => {
     );
   }
 
-  if (typeof error === 'object' && error !== null && 'message' in error) {
+  if (typeof error === "object" && error !== null && "message" in error) {
     return { message: String((error as { message: unknown }).message) };
   }
 
@@ -69,17 +74,18 @@ export const handleLogin = createAsyncThunk<
   AuthResponse,
   LoginPayload,
   { rejectValue: ApiError }
->('auth/handleLogin', async ({ email, password }, { rejectWithValue }) => {
+>("auth/handleLogin", async ({ email, password }, { rejectWithValue }) => {
   try {
-    const data = await post<AuthResponse>('/auth/login', {
-      email,
-      password,
-    });
+    const data = await post<AuthResponse>(
+      "/auth/login",
+      { email, password },
+      { skipAuthRefresh: true },
+    );
 
     setApiAccessToken(data.accessToken);
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Đăng nhập thất bại'));
+    return rejectWithValue(getErrorPayload(error, "Đăng nhập thất bại"));
   }
 });
 
@@ -87,33 +93,41 @@ export const handleRegister = createAsyncThunk<
   AuthResponse,
   RegisterPayload,
   { rejectValue: ApiError }
->('auth/handleRegister', async ({ email, password, fullName }, { rejectWithValue }) => {
-  try {
-    const data = await post<AuthResponse>('/auth/register', {
-      email,
-      password,
-      fullName,
-    });
+>(
+  "auth/handleRegister",
+  async ({ email, password, fullName }, { rejectWithValue }) => {
+    try {
+      const data = await post<AuthResponse>(
+        "/auth/register",
+        { email, password, fullName },
+        { skipAuthRefresh: true },
+      );
 
-    setApiAccessToken(data.accessToken);
-    return data;
-  } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Đăng ký thất bại'));
-  }
-});
+      setApiAccessToken(data.accessToken);
+      return data;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorPayload(error, "Đăng ký thất bại"));
+    }
+  },
+);
 
 export const handleRefreshToken = createAsyncThunk<
   RefreshResponse,
   void,
   { rejectValue: ApiError }
->('auth/handleRefreshToken', async (_, { rejectWithValue }) => {
+>("auth/handleRefreshToken", async (_, { rejectWithValue }) => {
   try {
-    const data = await post<RefreshResponse>('/auth/refresh');
+    const data = await post<RefreshResponse>(
+      "/auth/refresh",
+      undefined,
+      { skipAuthRefresh: true },
+    );
+
     setApiAccessToken(data.accessToken);
     return data;
   } catch (error: unknown) {
     clearApiAccessToken();
-    return rejectWithValue(getErrorPayload(error, 'Refresh token thất bại'));
+    return rejectWithValue(getErrorPayload(error, "Refresh token thất bại"));
   }
 });
 
@@ -121,12 +135,14 @@ export const getMe = createAsyncThunk<
   MeResponse,
   void,
   { rejectValue: ApiError }
->('auth/getMe', async (_, { rejectWithValue }) => {
+>("auth/getMe", async (_, { rejectWithValue }) => {
   try {
-    const data = await get<MeResponse>('/auth/me');
+    const data = await get<MeResponse>("/auth/me");
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Lấy thông tin user thất bại'));
+    return rejectWithValue(
+      getErrorPayload(error, "Lấy thông tin user thất bại"),
+    );
   }
 });
 
@@ -134,14 +150,19 @@ export const handleLogout = createAsyncThunk<
   LogoutResponse,
   void,
   { rejectValue: ApiError }
->('auth/handleLogout', async (_, { rejectWithValue }) => {
+>("auth/handleLogout", async (_, { rejectWithValue }) => {
   try {
-    const data = await post<LogoutResponse>('/auth/logout');
+    const data = await post<LogoutResponse>(
+      "/auth/logout",
+      undefined,
+      { skipAuthRefresh: true },
+    );
+
     clearApiAccessToken();
     return data;
   } catch (error: unknown) {
     clearApiAccessToken();
-    return rejectWithValue(getErrorPayload(error, 'Đăng xuất thất bại'));
+    return rejectWithValue(getErrorPayload(error, "Đăng xuất thất bại"));
   }
 });
 
@@ -155,12 +176,13 @@ const initialState: AuthState = {
 };
 
 export const authSlice = createSlice({
-  name: 'authSlice',
+  name: "authSlice",
   initialState,
   reducers: {
     setAccessToken: (state, action: PayloadAction<string | null>) => {
       state.accessToken = action.payload;
       state.isAuthenticated = !!action.payload;
+
       if (action.payload) {
         setApiAccessToken(action.payload);
       } else {
@@ -195,8 +217,11 @@ export const authSlice = createSlice({
       })
       .addCase(handleLogin.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Đăng nhập thất bại' };
+        state.error = action.payload || { message: "Đăng nhập thất bại" };
+        state.userInfo = null;
+        state.accessToken = null;
         state.isAuthenticated = false;
+        state.bootstrapped = true;
       })
 
       .addCase(handleRegister.pending, (state) => {
@@ -212,7 +237,11 @@ export const authSlice = createSlice({
       })
       .addCase(handleRegister.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Đăng ký thất bại' };
+        state.error = action.payload || { message: "Đăng ký thất bại" };
+        state.userInfo = null;
+        state.accessToken = null;
+        state.isAuthenticated = false;
+        state.bootstrapped = true;
       })
 
       .addCase(handleRefreshToken.pending, (state) => {
@@ -226,13 +255,15 @@ export const authSlice = createSlice({
           state.userInfo = action.payload.user;
         }
         state.isAuthenticated = true;
+        state.bootstrapped = true;
       })
       .addCase(handleRefreshToken.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Refresh token thất bại' };
-        state.accessToken = null;
+        state.error = action.payload || { message: "Refresh token thất bại" };
         state.userInfo = null;
+        state.accessToken = null;
         state.isAuthenticated = false;
+        state.bootstrapped = true;
       })
 
       .addCase(getMe.pending, (state) => {
@@ -245,14 +276,16 @@ export const authSlice = createSlice({
         state.isAuthenticated = true;
         state.bootstrapped = true;
       })
-       .addCase(getMe.rejected, (state, action) => {
+      .addCase(getMe.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Lấy thông tin user thất bại' };
+        state.error =
+          action.payload || { message: "Lấy thông tin user thất bại" };
         state.userInfo = null;
         state.accessToken = null;
         state.isAuthenticated = false;
         state.bootstrapped = true;
-})
+        clearApiAccessToken();
+      })
 
       .addCase(handleLogout.pending, (state) => {
         state.loading = true;
@@ -267,7 +300,7 @@ export const authSlice = createSlice({
       })
       .addCase(handleLogout.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Đăng xuất thất bại' };
+        state.error = action.payload || { message: "Đăng xuất thất bại" };
         state.userInfo = null;
         state.accessToken = null;
         state.isAuthenticated = false;
@@ -276,5 +309,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setAccessToken, clearAuth, setBootstrapped } = authSlice.actions;
+export const { setAccessToken, clearAuth, setBootstrapped } =
+  authSlice.actions;
+
 export default authSlice.reducer;

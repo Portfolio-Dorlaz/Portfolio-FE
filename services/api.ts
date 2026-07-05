@@ -5,8 +5,10 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const API_URL_RENDER = process.env.NEXT_PUBLIC_API_URL_RENDER;
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL_RENDER ||
+  process.env.NEXT_PUBLIC_API_URL_DEV ||
+  "";
 
 type ApiErrorResponse = {
   message?: string;
@@ -58,13 +60,56 @@ const shouldSkipRefresh = (config?: CustomAxiosRequestConfig) => {
 };
 
 export const api = axios.create({
-  baseURL: API_URL_RENDER,
+  baseURL: API_URL,
   withCredentials: true,
 });
 
+const refreshAccessToken = async (): Promise<string> => {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post<RefreshResponse>(
+        `${API_URL}/auth/refresh`,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
+      .then((res) => {
+        const newAccessToken = res.data.accessToken;
+
+        if (!newAccessToken) {
+          throw new Error("Không nhận được access token mới");
+        }
+
+        setApiAccessToken(newAccessToken);
+        return newAccessToken;
+      })
+      .catch((error) => {
+        clearApiAccessToken();
+        throw error;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+};
+
+export const initializeAuth = async () => {
+  if (accessToken) return accessToken;
+
+  try {
+    return await refreshAccessToken();
+  } catch {
+    clearApiAccessToken();
+    return null;
+  }
+};
+
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (accessToken) {
+    if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
@@ -97,26 +142,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        if (!refreshPromise) {
-          refreshPromise = axios
-            .post<RefreshResponse>(
-              `${API_URL_RENDER}/auth/refresh`,
-              {},
-              {
-                withCredentials: true,
-              },
-            )
-            .then((res) => {
-              const newAccessToken = res.data.accessToken;
-              setApiAccessToken(newAccessToken);
-              return newAccessToken;
-            })
-            .finally(() => {
-              refreshPromise = null;
-            });
-        }
-
-        const newAccessToken = await refreshPromise;
+        const newAccessToken = await refreshAccessToken();
 
         if (!originalRequest.headers) {
           originalRequest.headers = {} as InternalAxiosRequestConfig["headers"];

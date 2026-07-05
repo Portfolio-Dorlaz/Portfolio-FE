@@ -1,10 +1,8 @@
 "use client";
 
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import Link from "next/link";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import { App, Button, Form, Input, Select, Switch } from "antd";
+import { Button, Form, Input, Select, Switch, message } from "antd";
 import {
   ArrowLeftOutlined,
   CameraOutlined,
@@ -14,7 +12,13 @@ import {
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { createPost, clearPostState } from "@/redux/slices/postSlice";
-import { PostLoadingSelector } from "@/redux/selector";
+import { handleRefreshToken } from "@/redux/slices/authSlice";
+import {
+  AuthenticatedSelector,
+  AuthLoadingSelector,
+  AuthBootstrappedSelector,
+  PostLoadingSelector,
+} from "@/redux/selector";
 
 const { TextArea } = Input;
 
@@ -34,7 +38,9 @@ type RejectedError = {
 export default function CreatePostPage() {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(PostLoadingSelector);
-  const { message } = App.useApp();
+  const authLoading = useAppSelector(AuthLoadingSelector);
+  const isAuthenticated = useAppSelector(AuthenticatedSelector);
+  const bootstrapped = useAppSelector(AuthBootstrappedSelector);
   const [form] = Form.useForm<CreatePostValues>();
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -51,6 +57,12 @@ export default function CreatePostPage() {
       }
     };
   }, [dispatch, previewUrl]);
+
+  useEffect(() => {
+    if (!bootstrapped) {
+      dispatch(handleRefreshToken());
+    }
+  }, [bootstrapped, dispatch]);
 
   const categories = useMemo(
     () => [
@@ -120,6 +132,10 @@ export default function CreatePostPage() {
 
   const handleSubmit = async (values: CreatePostValues) => {
     try {
+      if (!isAuthenticated) {
+        await dispatch(handleRefreshToken()).unwrap();
+      }
+
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("slug", values.slug);
@@ -147,8 +163,8 @@ export default function CreatePostPage() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] text-slate-900">
-      <Header />
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.10),transparent_22%)]" />
+
       <section className="mx-auto max-w-[1180px] px-6 pb-8 pt-[72px] max-[640px]:px-4">
         <div className="rounded-[28px] border border-white/80 bg-white/80 px-8 py-8 shadow-[0_24px_80px_rgba(37,99,235,0.08)] backdrop-blur max-[640px]:px-5">
           <div className="mb-4">
@@ -298,7 +314,8 @@ export default function CreatePostPage() {
                     type="primary"
                     size="large"
                     icon={<SaveOutlined />}
-                    loading={loading}
+                    loading={loading || authLoading || !bootstrapped}
+                    disabled={authLoading || !bootstrapped}
                     className="!h-auto !rounded-full !border-0 !bg-blue-600 !px-5 !py-3 !font-bold !shadow-[0_14px_24px_rgba(37,99,235,0.18)] hover:!bg-blue-700"
                   >
                     Tạo bài viết
@@ -411,7 +428,6 @@ export default function CreatePostPage() {
           </aside>
         </div>
       </section>
-      <Footer />
     </main>
   );
 }
