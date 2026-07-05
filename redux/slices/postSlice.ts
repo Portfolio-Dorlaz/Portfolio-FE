@@ -80,9 +80,7 @@ export const createPost = createAsyncThunk<
 >("post/createPost", async (payload, { rejectWithValue }) => {
   try {
     const data = await post<CreatePostResponse>("/posts", payload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      withCredentials: true,
     });
 
     return data;

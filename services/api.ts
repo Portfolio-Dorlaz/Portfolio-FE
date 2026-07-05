@@ -5,6 +5,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_URL_RENDER = process.env.NEXT_PUBLIC_API_URL_RENDER;
 
 type ApiErrorResponse = {
