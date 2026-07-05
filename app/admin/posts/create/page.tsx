@@ -19,6 +19,7 @@ import {
   AuthBootstrappedSelector,
   PostLoadingSelector,
 } from "@/redux/selector";
+import { getApiAccessToken } from "@/services/api";
 
 const { TextArea } = Input;
 
@@ -134,6 +135,14 @@ export default function CreatePostPage() {
     try {
       if (!isAuthenticated) {
         await dispatch(handleRefreshToken()).unwrap();
+      }
+
+      const token = getApiAccessToken();
+      console.log("ACCESS TOKEN BEFORE CREATE:", token);
+
+      if (!token) {
+        message.error("Không có access token");
+        return;
       }
 
       const formData = new FormData();
