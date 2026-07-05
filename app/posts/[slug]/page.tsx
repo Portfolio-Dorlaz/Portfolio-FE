@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -41,27 +41,6 @@ export default function PostDetailPage() {
     null,
   );
 
-  const relatedPosts = [
-    {
-      id: "2",
-      slug: "thiet-ke-landing-page-sang-sach-va-de-doc",
-      title: "Thiết kế landing page sáng, sạch và dễ đọc",
-      category: "UI/UX",
-    },
-    {
-      id: "3",
-      slug: "jwt-auth-co-ban-cho-blog-cms-ca-nhan",
-      title: "JWT auth cơ bản cho blog CMS cá nhân",
-      category: "Backend",
-    },
-    {
-      id: "4",
-      slug: "to-chuc-auth-flow-cho-frontend-voi-redux-toolkit",
-      title: "Tổ chức auth flow cho frontend với Redux Toolkit",
-      category: "Frontend",
-    },
-  ];
-
   const createHeadingId = (text: string) => {
     return text
       .toLowerCase()
@@ -70,8 +49,27 @@ export default function PostDetailPage() {
       .replace(/đ/g, "d")
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
-      .replace(/\s+/g, "-");
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
   };
+
+  const formattedCreatedAt = postDetail?.createdAt
+    ? new Date(postDetail.createdAt).toLocaleString("vi-VN")
+    : "Không rõ ngày tạo";
+
+  const formattedUpdatedAt = postDetail?.updatedAt
+    ? new Date(postDetail.updatedAt).toLocaleString("vi-VN")
+    : null;
+
+  const estimatedReadTime = useMemo(() => {
+    const content =
+      `${postDetail?.excerpt || ""} ${postDetail?.content || ""}`.trim();
+    if (!content) return null;
+
+    const words = content.split(/\s+/).filter(Boolean).length;
+    const minutes = Math.max(1, Math.ceil(words / 200));
+    return `${minutes} phút đọc`;
+  }, [postDetail?.excerpt, postDetail?.content]);
 
   useEffect(() => {
     if (slug) {
@@ -158,7 +156,11 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] px-4 py-10 text-slate-900">
-        Đang tải bài viết...
+        <div className="mx-auto max-w-[1080px]">
+          <div className="rounded-[28px] border border-white/80 bg-white/90 p-8 shadow-[0_18px_50px_rgba(37,99,235,0.06)]">
+            Đang tải bài viết...
+          </div>
+        </div>
       </main>
     );
   }
@@ -166,7 +168,11 @@ export default function PostDetailPage() {
   if (!postDetail) {
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] px-4 py-10 text-slate-900">
-        Không tìm thấy bài viết.
+        <div className="mx-auto max-w-[1080px]">
+          <div className="rounded-[28px] border border-white/80 bg-white/90 p-8 shadow-[0_18px_50px_rgba(37,99,235,0.06)]">
+            Không tìm thấy bài viết.
+          </div>
+        </div>
       </main>
     );
   }
@@ -174,36 +180,63 @@ export default function PostDetailPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] text-slate-900">
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.08),transparent_24%)]" />
-      <section className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] px-5 pb-10 pt-[72px] max-[768px]:px-4 max-[768px]:pb-7 max-[768px]:pt-14">
-        <div className="mx-auto max-w-[860px]">
-          <p className="mb-[18px] inline-flex items-center rounded-full bg-blue-50 px-3 py-1.5 text-[13px] font-bold uppercase tracking-[0.04em] text-blue-700">
-            {postDetail.category}
-          </p>
-          <h1 className="m-0 text-[clamp(34px,5vw,58px)] leading-[1.08] tracking-[-0.03em] text-slate-900">
-            {postDetail.title}
-          </h1>
-          <p className="mt-[18px] max-w-[720px] text-[18px] leading-[1.8] text-slate-600">
-            {postDetail.excerpt ||
-              "Bài viết chi tiết về dự án và cách tổ chức hệ thống."}
-          </p>
 
-          <div className="mt-6 flex flex-wrap gap-x-[18px] gap-y-3 text-sm text-slate-500">
-            <span>
-              {postDetail.createdAt
-                ? new Date(postDetail.createdAt).toLocaleDateString("vi-VN")
-                : "Unknown date"}
-            </span>
-            <span>6 min read</span>
-            <span>By Võ Tấn Tài</span>
+      <section className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] px-5 pb-10 pt-[72px] max-[768px]:px-4 max-[768px]:pb-7 max-[768px]:pt-14">
+        <div className="mx-auto max-w-[1080px]">
+          <div className="mb-5">
+            <Link
+              href="/posts"
+              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 no-underline transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            >
+              ← Quay lại danh sách bài viết
+            </Link>
           </div>
+
+          <div className="max-w-[860px]">
+            {postDetail.category && (
+              <p className="mb-[18px] inline-flex items-center rounded-full bg-blue-50 px-3 py-1.5 text-[13px] font-bold uppercase tracking-[0.04em] text-blue-700">
+                {postDetail.category}
+              </p>
+            )}
+
+            <h1 className="m-0 text-[clamp(34px,5vw,58px)] leading-[1.08] tracking-[-0.03em] text-slate-900">
+              {postDetail.title}
+            </h1>
+
+            {postDetail.excerpt && (
+              <p className="mt-[18px] max-w-[760px] text-[18px] leading-[1.8] text-slate-600">
+                {postDetail.excerpt}
+              </p>
+            )}
+
+            <div className="mt-6 flex flex-wrap gap-x-[18px] gap-y-3 text-sm text-slate-500">
+              <span>{formattedCreatedAt}</span>
+              {estimatedReadTime && <span>{estimatedReadTime}</span>}
+              {postDetail.updatedAt && formattedUpdatedAt && (
+                <span>Cập nhật: {formattedUpdatedAt}</span>
+              )}
+              {postDetail.slug && <span>Slug: {postDetail.slug}</span>}
+            </div>
+          </div>
+
+          {postDetail.thumbnailUrl && (
+            <div className="mt-8 overflow-hidden rounded-[30px] border border-white/80 bg-white shadow-[0_18px_50px_rgba(37,99,235,0.08)]">
+              <img
+                src={postDetail.thumbnailUrl}
+                alt={postDetail.title || "Thumbnail bài viết"}
+                className="block max-h-[620px] w-full object-cover"
+              />
+            </div>
+          )}
         </div>
       </section>
 
       <section className="sticky top-0 z-20 border-b border-slate-200 bg-[rgba(255,255,255,0.86)] backdrop-blur-[10px]">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-5 px-5 py-[14px] max-[768px]:px-4">
+        <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-5 px-5 py-[14px] max-[900px]:flex-col max-[900px]:items-start max-[768px]:px-4">
           <p className="m-0 text-xs font-bold uppercase tracking-[0.08em] text-blue-700">
-            On this page
+            Mục lục
           </p>
+
           <nav className="flex flex-wrap gap-x-[18px] gap-y-2">
             {tocItems.length > 0 ? (
               tocItems.map((item) => (
@@ -228,16 +261,16 @@ export default function PostDetailPage() {
                   Nội dung
                 </a>
                 <a
+                  href="#post-meta"
+                  className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
+                >
+                  Thông tin bài viết
+                </a>
+                <a
                   href="#comments"
                   className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
                 >
                   Bình luận
-                </a>
-                <a
-                  href="#related"
-                  className="text-sm text-slate-600 no-underline transition-colors hover:text-blue-700"
-                >
-                  Liên quan
                 </a>
               </>
             )}
@@ -245,126 +278,120 @@ export default function PostDetailPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1320px] grid-cols-[260px_minmax(0,1fr)_260px] gap-6 px-5 pb-0 pt-8 max-[1180px]:grid-cols-1 max-[768px]:px-4">
-        <aside className="sticky top-[92px] self-start max-[1180px]:hidden">
-          <div className="overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
-            <img
-              src="https://picsum.photos/seed/cms-left/420/720"
-              alt="Workspace and planning notes for CMS architecture"
-              className="block h-[720px] w-full object-cover"
-            />
-          </div>
-        </aside>
-
+      <section className="mx-auto max-w-[1080px] px-5 pb-0 pt-8 max-[768px]:px-4">
         <article
-          className="rounded-[28px] border border-white/80 bg-white/95 p-10 shadow-[0_18px_50px_rgba(37,99,235,0.06)] max-[1180px]:p-8 max-[768px]:rounded-[22px] max-[768px]:p-6"
+          className="rounded-[28px] border border-white/80 bg-white/95 p-10 shadow-[0_18px_50px_rgba(37,99,235,0.06)] max-[768px]:rounded-[22px] max-[768px]:p-6"
           id="content"
           ref={contentRef}
         >
-          <section className="[&+section]:mt-7">
-            <h2 className="mb-[10px] scroll-mt-24 text-[28px] text-slate-900">
-              Giới thiệu
+          <section className="border-b border-slate-200 pb-6" id="post-meta">
+            <h2 className="mb-4 scroll-mt-24 text-[28px] text-slate-900">
+              Thông tin bài viết
             </h2>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              {postDetail.excerpt ||
-                "Bài viết này trình bày chi tiết quá trình xây dựng hệ thống, tổ chức mã nguồn và triển khai các luồng xử lý chính."}
-            </p>
+
+            <div className="grid grid-cols-2 gap-4 max-[768px]:grid-cols-1">
+              <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                  Tiêu đề
+                </p>
+                <p className="m-0 text-base font-semibold text-slate-900">
+                  {postDetail.title || "—"}
+                </p>
+              </div>
+
+              <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                  Slug
+                </p>
+                <p className="m-0 break-all text-base text-slate-700">
+                  {postDetail.slug || "—"}
+                </p>
+              </div>
+
+              <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                  Danh mục
+                </p>
+                <p className="m-0 text-base text-slate-700">
+                  {postDetail.category || "—"}
+                </p>
+              </div>
+
+              <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                  Ngày tạo
+                </p>
+                <p className="m-0 text-base text-slate-700">
+                  {formattedCreatedAt}
+                </p>
+              </div>
+
+              {formattedUpdatedAt && (
+                <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                    Cập nhật lần cuối
+                  </p>
+                  <p className="m-0 text-base text-slate-700">
+                    {formattedUpdatedAt}
+                  </p>
+                </div>
+              )}
+
+              {estimatedReadTime && (
+                <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
+                    Thời gian đọc
+                  </p>
+                  <p className="m-0 text-base text-slate-700">
+                    {estimatedReadTime}
+                  </p>
+                </div>
+              )}
+            </div>
           </section>
 
-          <section className="[&+section]:mt-7">
+          {postDetail.excerpt && (
+            <section className="mt-8">
+              <h2 className="mb-[10px] scroll-mt-24 text-[28px] text-slate-900">
+                Tóm tắt
+              </h2>
+              <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
+                {postDetail.excerpt}
+              </p>
+            </section>
+          )}
+
+          <section className="mt-8">
             <h2 className="mb-[10px] scroll-mt-24 text-[28px] text-slate-900">
-              Tổng quan bài viết
+              Nội dung
             </h2>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              {postDetail.content}
-            </p>
-          </section>
 
-          <section className="[&+section]:mt-7">
-            <h2 className="mb-[10px] scroll-mt-24 text-[28px] text-slate-900">
-              Cách tổ chức hệ thống
-            </h2>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              Nội dung bài viết tập trung vào cách chia layer rõ ràng giữa
-              frontend, backend, route, middleware, service và database để dễ mở
-              rộng về sau.
-            </p>
-          </section>
-
-          <section className="[&+section]:mt-7">
-            <h3 className="mb-[10px] scroll-mt-24 text-[22px] text-slate-900">
-              Xử lý auth
-            </h3>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              Phần auth thường được tách qua middleware để xác thực token trước
-              khi controller xử lý nghiệp vụ chính.
-            </p>
-          </section>
-
-          <section className="[&+section]:mt-7">
-            <h3 className="mb-[10px] scroll-mt-24 text-[22px] text-slate-900">
-              Quản lý state
-            </h3>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              Với frontend, Redux Toolkit giúp tách rõ async thunk, slice,
-              selector và trạng thái loading, error, success một cách gọn hơn.
-            </p>
-          </section>
-
-          <section className="[&+section]:mt-7">
-            <h2 className="mb-[10px] scroll-mt-24 text-[28px] text-slate-900">
-              Kết quả triển khai
-            </h2>
-            <p className="m-0 whitespace-pre-line text-base leading-[1.9] text-slate-700">
-              Sau khi hoàn thiện, hệ thống có thể hiển thị bài viết theo slug,
-              lấy danh sách comment theo post, và giữ luồng dữ liệu nhất quán
-              giữa store và giao diện.
-            </p>
+            {postDetail.content ? (
+              <div className="space-y-5">
+                {postDetail.content
+                  .split(/\n{2,}/)
+                  .map((paragraph, index) => paragraph.trim())
+                  .filter(Boolean)
+                  .map((paragraph, index) => (
+                    <p
+                      key={`${index}-${paragraph.slice(0, 16)}`}
+                      className="m-0 whitespace-pre-line text-base leading-[1.95] text-slate-700"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+              </div>
+            ) : (
+              <p className="m-0 text-base leading-[1.9] text-slate-500">
+                Bài viết chưa có nội dung.
+              </p>
+            )}
           </section>
         </article>
-
-        <aside className="sticky top-[92px] self-start max-[1180px]:hidden">
-          <div className="overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
-            <img
-              src="https://picsum.photos/seed/cms-right/420/720"
-              alt="Developer desk with code editor and system diagrams"
-              className="block h-[720px] w-full object-cover"
-            />
-          </div>
-        </aside>
       </section>
 
       <section
-        className="mx-auto mt-12 max-w-[1200px] px-5 max-[768px]:px-4"
-        id="related"
-      >
-        <div className="mb-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-blue-700">
-            Continue reading
-          </p>
-          <h2 className="m-0 text-[30px] text-slate-900">Bài viết liên quan</h2>
-        </div>
-
-        <div className="grid grid-cols-3 gap-[18px] max-[768px]:grid-cols-1">
-          {relatedPosts.map((item) => (
-            <Link
-              key={item.id}
-              href={`/posts/${item.slug}`}
-              className="block rounded-[22px] border border-white/80 bg-white/92 p-[22px] no-underline shadow-[0_10px_30px_rgba(37,99,235,0.06)] transition duration-200 hover:-translate-y-[3px] hover:border-blue-200 hover:shadow-[0_18px_36px_rgba(37,99,235,0.1)]"
-            >
-              <span className="mb-[10px] inline-block text-[13px] font-bold text-blue-700">
-                {item.category}
-              </span>
-              <h3 className="m-0 text-[19px] leading-[1.5] text-slate-900">
-                {item.title}
-              </h3>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section
-        className="mx-auto mt-12 max-w-[960px] px-5 pb-[72px] max-[768px]:px-4"
+        className="mx-auto mt-12 max-w-[1080px] px-5 pb-[72px] max-[768px]:px-4"
         id="comments"
       >
         <div className="mb-5">
@@ -396,7 +423,9 @@ export default function PostDetailPage() {
               />
             ))
           ) : (
-            <p className="text-slate-600">Chưa có bình luận nào.</p>
+            <div className="rounded-[22px] border border-white/80 bg-white/92 p-5 shadow-[0_10px_30px_rgba(37,99,235,0.05)]">
+              <p className="m-0 text-slate-600">Chưa có bình luận nào.</p>
+            </div>
           )}
         </div>
       </section>
