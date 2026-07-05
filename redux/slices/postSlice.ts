@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { put, del, get, post } from '../../services/api';
+import axios from "axios";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { del, get, post, put } from "../../services/api";
 
-type Post = {
+export type Post = {
   id: string;
   title: string;
   slug: string;
@@ -11,15 +11,12 @@ type Post = {
   category: string;
   createdAt?: string;
   updatedAt?: string;
+  thumbnailUrl?: string | null;
+  imageUrl?: string | null;
+  isPublished?: boolean;
 };
 
-type CreatePostPayload = {
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  category: string;
-};
+type CreatePostPayload = FormData;
 
 type UpdatePostPayload = {
   id: string;
@@ -28,6 +25,7 @@ type UpdatePostPayload = {
   excerpt?: string;
   content?: string;
   category?: string;
+  isPublished?: boolean;
 };
 
 type DeletePostPayload = {
@@ -68,7 +66,7 @@ const getErrorPayload = (error: unknown, fallback: string): ApiError => {
     );
   }
 
-  if (typeof error === 'object' && error !== null && 'message' in error) {
+  if (typeof error === "object" && error !== null && "message" in error) {
     return { message: String((error as { message: unknown }).message) };
   }
 
@@ -79,12 +77,17 @@ export const createPost = createAsyncThunk<
   CreatePostResponse,
   CreatePostPayload,
   { rejectValue: ApiError }
->('post/createPost', async (payload, { rejectWithValue }) => {
+>("post/createPost", async (payload, { rejectWithValue }) => {
   try {
-    const data = await post<CreatePostResponse>('/posts', payload);
+    const data = await post<CreatePostResponse>("/posts", payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Tạo bài viết thất bại'));
+    return rejectWithValue(getErrorPayload(error, "Tạo bài viết thất bại"));
   }
 });
 
@@ -92,12 +95,14 @@ export const getAllPosts = createAsyncThunk<
   GetAllPostsResponse,
   void,
   { rejectValue: ApiError }
->('post/getAllPosts', async (_, { rejectWithValue }) => {
+>("post/getAllPosts", async (_, { rejectWithValue }) => {
   try {
-    const data = await get<GetAllPostsResponse>('/posts');
+    const data = await get<GetAllPostsResponse>("/posts");
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Lấy danh sách bài viết thất bại'));
+    return rejectWithValue(
+      getErrorPayload(error, "Lấy danh sách bài viết thất bại"),
+    );
   }
 });
 
@@ -105,12 +110,14 @@ export const getPostBySlug = createAsyncThunk<
   GetPostBySlugResponse,
   GetPostBySlugPayload,
   { rejectValue: ApiError }
->('post/getPostBySlug', async ({ slug }, { rejectWithValue }) => {
+>("post/getPostBySlug", async ({ slug }, { rejectWithValue }) => {
   try {
     const data = await get<GetPostBySlugResponse>(`/posts/${slug}`);
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Lấy bài viết theo slug thất bại'));
+    return rejectWithValue(
+      getErrorPayload(error, "Lấy bài viết theo slug thất bại"),
+    );
   }
 });
 
@@ -118,12 +125,14 @@ export const updatePost = createAsyncThunk<
   UpdatePostResponse,
   UpdatePostPayload,
   { rejectValue: ApiError }
->('post/updatePost', async ({ id, ...payload }, { rejectWithValue }) => {
+>("post/updatePost", async ({ id, ...payload }, { rejectWithValue }) => {
   try {
     const data = await put<UpdatePostResponse>(`/posts/${id}`, payload);
     return data;
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Cập nhật bài viết thất bại'));
+    return rejectWithValue(
+      getErrorPayload(error, "Cập nhật bài viết thất bại"),
+    );
   }
 });
 
@@ -131,12 +140,12 @@ export const deletePost = createAsyncThunk<
   DeletePostPayload,
   DeletePostPayload,
   { rejectValue: ApiError }
->('post/deletePost', async ({ id }, { rejectWithValue }) => {
+>("post/deletePost", async ({ id }, { rejectWithValue }) => {
   try {
     await del<DeletePostResponse>(`/posts/${id}`);
     return { id };
   } catch (error: unknown) {
-    return rejectWithValue(getErrorPayload(error, 'Xóa bài viết thất bại'));
+    return rejectWithValue(getErrorPayload(error, "Xóa bài viết thất bại"));
   }
 });
 
@@ -149,7 +158,7 @@ const initialState: PostState = {
 };
 
 export const postSlice = createSlice({
-  name: 'postSlice',
+  name: "postSlice",
   initialState,
   reducers: {
     clearPostState: (state) => {
@@ -178,7 +187,7 @@ export const postSlice = createSlice({
       })
       .addCase(createPost.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Tạo bài viết thất bại' };
+        state.error = action.payload || { message: "Tạo bài viết thất bại" };
         state.success = false;
       })
 
@@ -192,7 +201,9 @@ export const postSlice = createSlice({
       })
       .addCase(getAllPosts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Lấy danh sách bài viết thất bại' };
+        state.error = action.payload || {
+          message: "Lấy danh sách bài viết thất bại",
+        };
       })
 
       .addCase(getPostBySlug.pending, (state) => {
@@ -205,7 +216,9 @@ export const postSlice = createSlice({
       })
       .addCase(getPostBySlug.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Lấy bài viết theo slug thất bại' };
+        state.error = action.payload || {
+          message: "Lấy bài viết theo slug thất bại",
+        };
         state.selectedPost = null;
       })
 
@@ -217,7 +230,7 @@ export const postSlice = createSlice({
       .addCase(updatePost.fulfilled, (state, action) => {
         state.loading = false;
         state.posts = state.posts.map((post) =>
-          post.id === action.payload.id ? action.payload : post
+          post.id === action.payload.id ? action.payload : post,
         );
 
         if (state.selectedPost?.id === action.payload.id) {
@@ -228,7 +241,9 @@ export const postSlice = createSlice({
       })
       .addCase(updatePost.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Cập nhật bài viết thất bại' };
+        state.error = action.payload || {
+          message: "Cập nhật bài viết thất bại",
+        };
         state.success = false;
       })
 
@@ -239,7 +254,9 @@ export const postSlice = createSlice({
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.loading = false;
-        state.posts = state.posts.filter((post) => post.id !== action.payload.id);
+        state.posts = state.posts.filter(
+          (post) => post.id !== action.payload.id,
+        );
 
         if (state.selectedPost?.id === action.payload.id) {
           state.selectedPost = null;
@@ -249,11 +266,13 @@ export const postSlice = createSlice({
       })
       .addCase(deletePost.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: 'Xóa bài viết thất bại' };
+        state.error = action.payload || { message: "Xóa bài viết thất bại" };
         state.success = false;
       });
   },
 });
 
-export const { clearPostState, clearSelectedPost, setSelectedPost } = postSlice.actions;
+export const { clearPostState, clearSelectedPost, setSelectedPost } =
+  postSlice.actions;
+
 export default postSlice.reducer;

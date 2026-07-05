@@ -1,5 +1,6 @@
 import axios, {
   AxiosError,
+  AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
@@ -22,7 +23,7 @@ type RefreshResponse = {
   user?: User;
 };
 
-export type CustomAxiosRequestConfig = InternalAxiosRequestConfig & {
+export type CustomAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
   skipAuthRefresh?: boolean;
 };
@@ -49,7 +50,6 @@ export const clearApiAccessToken = () => {
 
 const shouldSkipRefresh = (config?: CustomAxiosRequestConfig) => {
   if (!config) return true;
-
   if (config.skipAuthRefresh) return true;
 
   const url = config.url || "";
@@ -59,9 +59,6 @@ const shouldSkipRefresh = (config?: CustomAxiosRequestConfig) => {
 export const api = axios.create({
   baseURL: API_URL_RENDER,
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 api.interceptors.request.use(
@@ -69,6 +66,7 @@ api.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
     return config;
   },
   (error: AxiosError) => Promise.reject(error),
@@ -77,7 +75,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response: AxiosResponse) => response.data,
   async (error: AxiosError<ApiErrorResponse>) => {
-    const originalRequest = error.config as CustomAxiosRequestConfig | undefined;
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & {
+          _retry?: boolean;
+          skipAuthRefresh?: boolean;
+        })
+      | undefined;
 
     if (!error.response || !originalRequest) {
       return Promise.reject(error);
@@ -100,9 +103,6 @@ api.interceptors.response.use(
               {},
               {
                 withCredentials: true,
-                headers: {
-                  "Content-Type": "application/json",
-                },
               },
             )
             .then((res) => {
@@ -117,9 +117,11 @@ api.interceptors.response.use(
 
         const newAccessToken = await refreshPromise;
 
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        if (!originalRequest.headers) {
+          originalRequest.headers = {} as InternalAxiosRequestConfig["headers"];
         }
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
@@ -136,40 +138,40 @@ api.interceptors.response.use(
   },
 );
 
-export async function get<T>(
+export function get<T>(
   url: string,
-  config?: Partial<CustomAxiosRequestConfig>,
+  config?: CustomAxiosRequestConfig,
 ): Promise<T> {
-  return api.get<T>(url, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+  return api.get<T, T>(url, config);
 }
 
-export async function post<T>(
+export function post<T>(
   url: string,
   body?: unknown,
-  config?: Partial<CustomAxiosRequestConfig>,
+  config?: CustomAxiosRequestConfig,
 ): Promise<T> {
-  return api.post<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+  return api.post<T, T>(url, body, config);
 }
 
-export async function put<T>(
+export function put<T>(
   url: string,
   body?: unknown,
-  config?: Partial<CustomAxiosRequestConfig>,
+  config?: CustomAxiosRequestConfig,
 ): Promise<T> {
-  return api.put<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+  return api.put<T, T>(url, body, config);
 }
 
-export async function patch<T>(
+export function patch<T>(
   url: string,
   body?: unknown,
-  config?: Partial<CustomAxiosRequestConfig>,
+  config?: CustomAxiosRequestConfig,
 ): Promise<T> {
-  return api.patch<T>(url, body, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+  return api.patch<T, T>(url, body, config);
 }
 
-export async function del<T>(
+export function del<T>(
   url: string,
-  config?: Partial<CustomAxiosRequestConfig>,
+  config?: CustomAxiosRequestConfig,
 ): Promise<T> {
-  return api.delete<T>(url, config as CustomAxiosRequestConfig) as unknown as Promise<T>;
+  return api.delete<T, T>(url, config);
 }
