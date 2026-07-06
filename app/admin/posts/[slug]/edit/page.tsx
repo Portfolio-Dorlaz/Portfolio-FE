@@ -2,16 +2,20 @@
 
 import { message } from "antd";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { createPost, clearPostState } from "@/redux/slices/postSlice";
-import { handleRefreshToken } from "@/redux/slices/authSlice";
 import {
-  AuthenticatedSelector,
-  AuthLoadingSelector,
+  clearPostState,
+  getPostBySlug,
+  updatePost,
+} from "@/redux/slices/postSlice";
+import {
   AuthBootstrappedSelector,
+  AuthLoadingSelector,
+  PostDetailSelector,
   PostLoadingSelector,
 } from "@/redux/selector";
-import { getApiAccessToken } from "@/services/api";
+import { handleRefreshToken } from "@/redux/slices/authSlice";
 import PostEditorForm, {
   PostEditorFormValues,
 } from "@/components/comments/posts/PostEditorForm";
@@ -20,18 +24,15 @@ type RejectedError = {
   message?: string;
 };
 
-export default function CreatePostPage() {
+export default function UpdatePostPage() {
   const dispatch = useAppDispatch();
+  const params = useParams();
+  const slug = params?.slug as string;
+
   const loading = useAppSelector(PostLoadingSelector);
   const authLoading = useAppSelector(AuthLoadingSelector);
-  const isAuthenticated = useAppSelector(AuthenticatedSelector);
   const bootstrapped = useAppSelector(AuthBootstrappedSelector);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearPostState());
-    };
-  }, [dispatch]);
+  const postDetail = useAppSelector(PostDetailSelector);
 
   useEffect(() => {
     if (!bootstrapped) {
@@ -39,19 +40,25 @@ export default function CreatePostPage() {
     }
   }, [bootstrapped, dispatch]);
 
+  useEffect(() => {
+    if (slug) {
+      dispatch(getPostBySlug({ slug }));
+    }
+  }, [dispatch, slug]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearPostState());
+    };
+  }, [dispatch]);
+
   const handleSubmit = async (
     values: PostEditorFormValues,
     imageFile: File | null,
   ) => {
     try {
-      if (!isAuthenticated) {
-        await dispatch(handleRefreshToken()).unwrap();
-      }
-
-      const token = getApiAccessToken();
-
-      if (!token) {
-        message.error("Không có access token");
+      if (!postDetail?.id) {
+        message.error("Không tìm thấy id bài viết để cập nhật");
         return;
       }
 
@@ -67,33 +74,38 @@ export default function CreatePostPage() {
         formData.append("image", imageFile);
       }
 
-      await dispatch(createPost(formData)).unwrap();
+      await dispatch(
+        updatePost({
+          id: postDetail.id,
+          data: formData,
+        }),
+      ).unwrap();
 
-      message.success("Tạo bài viết thành công");
-      dispatch(clearPostState());
+      message.success("Cập nhật bài viết thành công");
     } catch (error) {
       const err = error as RejectedError;
-      console.error("create post error:", err);
-      message.error(err?.message || "Không thể tạo bài viết");
+      console.error("update post error:", err);
+      message.error(err?.message || "Không thể cập nhật bài viết");
       throw error;
     }
   };
 
   return (
     <PostEditorForm
-      mode="create"
+      mode="update"
       loading={loading || authLoading || !bootstrapped}
-      submitText="Tạo bài viết"
+      submitText="Lưu cập nhật"
       backHref="/admin"
       backText="Quay lại admin"
       initialValues={{
-        title: "",
-        slug: "",
-        excerpt: "",
-        content: "",
-        category: "Game Development",
-        isPublished: false,
+        title: postDetail?.title || "",
+        slug: postDetail?.slug || "",
+        excerpt: postDetail?.excerpt || "",
+        content: postDetail?.content || "",
+        category: postDetail?.category || "Game Development",
+        isPublished: Boolean(postDetail?.isPublished),
       }}
+      initialImageUrl={postDetail?.thumbnailUrl || ""}
       onSubmit={handleSubmit}
     />
   );

@@ -20,12 +20,7 @@ type CreatePostPayload = FormData;
 
 type UpdatePostPayload = {
   id: string;
-  title?: string;
-  slug?: string;
-  excerpt?: string;
-  content?: string;
-  category?: string;
-  isPublished?: boolean;
+  data: FormData;
 };
 
 type DeletePostPayload = {
@@ -123,9 +118,11 @@ export const updatePost = createAsyncThunk<
   UpdatePostResponse,
   UpdatePostPayload,
   { rejectValue: ApiError }
->("post/updatePost", async ({ id, ...payload }, { rejectWithValue }) => {
+>("post/updatePost", async ({ id, data: payload }, { rejectWithValue }) => {
   try {
-    const data = await put<UpdatePostResponse>(`/posts/${id}`, payload);
+    const data = await put<UpdatePostResponse>(`/posts/${id}`, payload, {
+      withCredentials: true,
+    });
     return data;
   } catch (error: unknown) {
     return rejectWithValue(

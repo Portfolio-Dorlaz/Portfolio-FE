@@ -171,7 +171,7 @@ export default function AdminPostsPage() {
           </Link>
 
           <Link
-            href={`/admin/posts/edit/${record.id}`}
+            href={`/admin/posts/${record.slug}/edit`}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
           >
             <EditOutlined />
