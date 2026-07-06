@@ -3,6 +3,12 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { del, get, post, put } from "../../services/api";
 
 export type Post = {
+  author: {
+    id: string;
+    fullName: string;
+    role: string;
+    email: string;
+  }
   id: string;
   title: string;
   slug: string;

@@ -6,12 +6,18 @@ import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/redux/hooks";
 import { getPostBySlug } from "@/redux/slices/postSlice";
-import { createComment, getCommentsByPost } from "@/redux/slices/commentSlice";
 import {
+  createComment,
+  deleteComment,
+  getCommentsByPost,
+} from "@/redux/slices/commentSlice";
+import {
+  AuthenticatedSelector,
   CommentListSelector,
   LoadingCommentSelector,
   PostDetailSelector,
   PostLoadingSelector,
+  UserInfoSelector,
 } from "@/redux/selector";
 import CommentForm, {
   type CommentFormValues,
@@ -29,11 +35,22 @@ export default function PostDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
 
+  // const user = useSelector(UserInfoSelector);
   const postDetail = useSelector(PostDetailSelector);
+  console.log("post detail: ", postDetail);
+
   const loading = useSelector(PostLoadingSelector);
 
   const commentsData = useSelector(CommentListSelector);
   const commentLoading = useSelector(LoadingCommentSelector);
+  const isAuthenticated = useSelector(AuthenticatedSelector);
+
+  const userInfo = useSelector(UserInfoSelector);
+  console.log("user info: ", userInfo);
+
+  const currentUserId = userInfo?.id || null;
+  const currentUserFullName = userInfo?.fullName || "";
+  const currentUserEmail = userInfo?.email || "";
 
   const contentRef = useRef<HTMLElement | null>(null);
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
@@ -150,6 +167,13 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error("Tạo reply thất bại:", error);
       throw error;
+    }
+  };
+
+  const handleDeleteComment = async (id: string): Promise<void> => {
+    await dispatch(deleteComment({ id })).unwrap();
+    if (postDetail?.id) {
+      await dispatch(getCommentsByPost({ postId: postDetail.id })).unwrap();
     }
   };
 
@@ -405,6 +429,9 @@ export default function PostDetailPage() {
           loading={commentLoading}
           onSubmit={handleSubmitComment}
           submitText="Gửi bình luận"
+          isAuthenticated={isAuthenticated}
+          currentUserFullName={currentUserFullName}
+          currentUserEmail={currentUserEmail}
         />
 
         <div className="mt-7 flex flex-col gap-[22px]">
@@ -416,9 +443,14 @@ export default function PostDetailPage() {
                 key={comment.id}
                 comment={comment}
                 replyingCommentId={replyingCommentId}
+                currentUserId={currentUserId}
+                isAdmin={userInfo?.role === "admin"}
+                isAuthenticated={isAuthenticated}
+                deleteLoadingId={replyingCommentId}
                 onReply={handleReplyClick}
                 onCancelReply={handleCancelReply}
                 onSubmitReply={handleSubmitReply}
+                onDelete={handleDeleteComment}
                 replyLoading={commentLoading}
               />
             ))

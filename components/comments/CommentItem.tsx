@@ -7,6 +7,7 @@ import CommentForm, {
 export type CommentAuthor = {
   id: string;
   fullName: string;
+  email: string;
 };
 
 export type CommentItemType = {
@@ -25,12 +26,17 @@ export type CommentItemProps = {
   comment: CommentItemType;
   depth?: number;
   replyingCommentId: string | null;
+  currentUserId?: string | null;
+  isAdmin?: boolean;
+  isAuthenticated?: boolean;
+  deleteLoadingId?: string | null;
   onReply: (commentId: string) => void;
   onCancelReply: () => void;
   onSubmitReply: (
     commentId: string,
     values: CommentFormValues,
   ) => Promise<void>;
+  onDelete: (commentId: string) => Promise<void> | void;
   replyLoading?: boolean;
 };
 
@@ -38,9 +44,14 @@ export default function CommentItem({
   comment,
   depth = 0,
   replyingCommentId,
+  currentUserId,
+  isAdmin = false,
+  isAuthenticated = false,
+  deleteLoadingId = null,
   onReply,
   onCancelReply,
   onSubmitReply,
+  onDelete,
   replyLoading = false,
 }: CommentItemProps) {
   const hasReplies =
@@ -48,6 +59,18 @@ export default function CommentItem({
 
   const isChild = depth > 0;
   const isReplying = replyingCommentId === comment.id;
+  const canReply = Boolean(isAuthenticated);
+  const canDelete = Boolean(
+    isAuthenticated && (isAdmin || currentUserId === comment.authorId),
+  );
+  console.log("comment authorId: ", comment.authorId);
+  console.log("current user id: ", currentUserId);
+  console.log("canDelete: ", canDelete);
+  console.log("isAdmin: ", isAdmin);
+
+  const isDeleting = deleteLoadingId === comment.id;
+  const currentUserFullName = comment.author?.fullName || "";
+  const currentUserEmail = comment.author?.email || "";
 
   return (
     <article className="flex flex-col gap-3">
@@ -82,13 +105,28 @@ export default function CommentItem({
             </div>
           </div>
 
-          <button
-            type="button"
-            className="self-start rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
-            onClick={() => onReply(comment.id)}
-          >
-            Trả lời
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {canReply && (
+              <button
+                type="button"
+                className="self-start rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
+                onClick={() => onReply(comment.id)}
+              >
+                Trả lời
+              </button>
+            )}
+
+            {canDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(comment.id)}
+                disabled={isDeleting}
+                className="self-start rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDeleting ? "Đang xóa..." : "Xóa"}
+              </button>
+            )}
+          </div>
         </div>
 
         <p className="m-0 whitespace-pre-line text-[15px] leading-[1.8] text-slate-700">
@@ -118,6 +156,9 @@ export default function CommentItem({
             loading={replyLoading}
             submitText="Gửi trả lời"
             showAuthorFields={false}
+            isAuthenticated={isAuthenticated}
+            currentUserFullName={currentUserFullName}
+            currentUserEmail={currentUserEmail}
             onSubmit={(values: CommentFormValues) =>
               onSubmitReply(comment.id, values)
             }
@@ -135,9 +176,14 @@ export default function CommentItem({
                 comment={reply}
                 depth={depth + 1}
                 replyingCommentId={replyingCommentId}
+                currentUserId={currentUserId}
+                isAdmin={isAdmin}
+                isAuthenticated={isAuthenticated}
+                deleteLoadingId={deleteLoadingId}
                 onReply={onReply}
                 onCancelReply={onCancelReply}
                 onSubmitReply={onSubmitReply}
+                onDelete={onDelete}
                 replyLoading={replyLoading}
               />
             ))}

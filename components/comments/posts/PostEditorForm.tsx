@@ -65,9 +65,7 @@ export default function PostEditorForm({
     });
   }, [form, initialValues]);
 
-  const previewUrl = useMemo(() => {
-    return blobPreviewUrl || initialImageUrl || "";
-  }, [blobPreviewUrl, initialImageUrl]);
+  const previewUrl = blobPreviewUrl || initialImageUrl || "";
 
   const revokeBlobUrl = (url?: string) => {
     if (url?.startsWith("blob:")) {

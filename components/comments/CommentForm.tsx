@@ -16,6 +16,9 @@ type CommentFormProps = {
   initialValues?: Partial<CommentFormValues>;
   submitText?: string;
   showAuthorFields?: boolean;
+  isAuthenticated: boolean;
+  currentUserFullName?: string;
+  currentUserEmail?: string;
   onSubmit: (values: CommentFormValues) => void | Promise<void>;
 };
 
@@ -24,29 +27,46 @@ export default function CommentForm({
   initialValues,
   submitText = "Gửi bình luận",
   showAuthorFields = true,
+  isAuthenticated,
+  currentUserFullName = "",
+  currentUserEmail = "",
   onSubmit,
 }: CommentFormProps) {
   const [form] = Form.useForm<CommentFormValues>();
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     form.setFieldsValue({
-      fullName: initialValues?.fullName || "",
-      email: initialValues?.email || "",
+      fullName: currentUserFullName || initialValues?.fullName || "",
+      email: currentUserEmail || initialValues?.email || "",
       content: initialValues?.content || "",
     });
-  }, [form, initialValues]);
+  }, [
+    form,
+    isAuthenticated,
+    currentUserFullName,
+    currentUserEmail,
+    initialValues,
+  ]);
 
   const handleFinish = async (values: CommentFormValues) => {
-    await onSubmit(values);
+    await onSubmit({
+      ...values,
+      fullName: currentUserFullName || values.fullName || "",
+      email: currentUserEmail || values.email || "",
+    });
 
-    form.resetFields();
-
-    if (!showAuthorFields) {
-      form.setFieldsValue({
-        content: "",
-      });
-    }
+    form.setFieldsValue({
+      fullName: currentUserFullName || "",
+      email: currentUserEmail || "",
+      content: "",
+    });
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="rounded-[24px] border border-white/80 bg-white/92 p-[22px] shadow-[0_14px_34px_rgba(37,99,235,0.06)] backdrop-blur">
@@ -69,9 +89,10 @@ export default function CommentForm({
               ]}
             >
               <Input
+                disabled
                 placeholder="Nhập tên của bạn"
                 size="large"
-                className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-slate-900 placeholder:!text-slate-400 hover:!border-slate-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                className="!rounded-2xl !border-slate-200 !bg-slate-100 !px-4 !py-3 !text-slate-900 disabled:!cursor-not-allowed disabled:!text-slate-500"
               />
             </Form.Item>
 
@@ -84,9 +105,10 @@ export default function CommentForm({
               ]}
             >
               <Input
+                disabled
                 placeholder="Nhập email của bạn"
                 size="large"
-                className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 !text-slate-900 placeholder:!text-slate-400 hover:!border-slate-300 focus:!border-blue-500 focus:!bg-white focus:!shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                className="!rounded-2xl !border-slate-200 !bg-slate-100 !px-4 !py-3 !text-slate-900 disabled:!cursor-not-allowed disabled:!text-slate-500"
               />
             </Form.Item>
           </div>

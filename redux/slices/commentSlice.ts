@@ -5,6 +5,7 @@ import { del, get, post, put } from '../../services/api';
 type CommentAuthor = {
   id: string;
   fullName: string;
+  email: string;
 };
 
 export type Comment = {
