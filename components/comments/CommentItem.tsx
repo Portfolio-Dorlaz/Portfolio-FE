@@ -63,10 +63,6 @@ export default function CommentItem({
   const canDelete = Boolean(
     isAuthenticated && (isAdmin || currentUserId === comment.authorId),
   );
-  console.log("comment authorId: ", comment.authorId);
-  console.log("current user id: ", currentUserId);
-  console.log("canDelete: ", canDelete);
-  console.log("isAdmin: ", isAdmin);
 
   const isDeleting = deleteLoadingId === comment.id;
   const currentUserFullName = comment.author?.fullName || "";

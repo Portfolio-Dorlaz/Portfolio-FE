@@ -2,6 +2,7 @@
 
 import { message } from "antd";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { createPost, clearPostState } from "@/redux/slices/postSlice";
 import { handleRefreshToken } from "@/redux/slices/authSlice";
@@ -22,6 +23,8 @@ type RejectedError = {
 
 export default function CreatePostPage() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
   const loading = useAppSelector(PostLoadingSelector);
   const authLoading = useAppSelector(AuthLoadingSelector);
   const isAuthenticated = useAppSelector(AuthenticatedSelector);
@@ -41,8 +44,9 @@ export default function CreatePostPage() {
 
   const handleSubmit = async (
     values: PostEditorFormValues,
-    imageFile: File | null,
-  ) => {
+    thumbnailFile: File | null,
+    galleryFiles: File[],
+  ): Promise<void> => {
     try {
       if (!isAuthenticated) {
         await dispatch(handleRefreshToken()).unwrap();
@@ -60,22 +64,57 @@ export default function CreatePostPage() {
       formData.append("slug", values.slug);
       formData.append("excerpt", values.excerpt || "");
       formData.append("content", values.content);
-      formData.append("category", values.category);
-      formData.append("isPublished", String(values.isPublished));
+      formData.append("category", values.category || "");
+      formData.append("status", values.status || "draft");
 
-      if (imageFile instanceof File) {
-        formData.append("image", imageFile);
+      if (values.thumbnailUrl) {
+        formData.append("thumbnailUrl", values.thumbnailUrl);
       }
 
-      await dispatch(createPost(formData)).unwrap();
+      if (thumbnailFile instanceof File) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+
+      galleryFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      formData.append(
+        "links",
+        JSON.stringify(
+          (values.links || []).map((item, index) => ({
+            label: item.label?.trim() || "",
+            url: item.url?.trim() || "",
+            sortOrder:
+              typeof item.sortOrder === "number" ? item.sortOrder : index,
+          })),
+        ),
+      );
+
+      formData.append(
+        "imageMetas",
+        JSON.stringify(
+          (values.images || []).map((item, index) => ({
+            alt: item.alt?.trim() || "",
+            sortOrder:
+              typeof item.sortOrder === "number" ? item.sortOrder : index,
+            url: item.url?.trim() || "",
+          })),
+        ),
+      );
+
+      const createdPost = await dispatch(createPost(formData)).unwrap();
 
       message.success("Tạo bài viết thành công");
       dispatch(clearPostState());
+
+      if (createdPost?.slug) {
+        router.push(`/posts/${createdPost.slug}`);
+      }
     } catch (error) {
       const err = error as RejectedError;
       console.error("create post error:", err);
       message.error(err?.message || "Không thể tạo bài viết");
-      throw error;
     }
   };
 
@@ -92,7 +131,10 @@ export default function CreatePostPage() {
         excerpt: "",
         content: "",
         category: "Game Development",
-        isPublished: false,
+        status: "draft",
+        thumbnailUrl: "",
+        links: [],
+        images: [],
       }}
       onSubmit={handleSubmit}
     />

@@ -2,24 +2,45 @@ import axios from "axios";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { del, get, post, put } from "../../services/api";
 
+export type PostLink = {
+  id?: string;
+  label: string;
+  url: string;
+  sortOrder?: number;
+};
+
+export type PostImage = {
+  id?: string;
+  url: string;
+  alt?: string | null;
+  sortOrder?: number;
+};
+
 export type Post = {
-  author: {
+  author?: {
     id: string;
     fullName: string;
-    role: string;
-    email: string;
-  }
+    role?: string;
+    email?: string;
+  };
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt?: string | null;
   content: string;
-  category: string;
+  category?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  publishedAt?: string | null;
   thumbnailUrl?: string | null;
-  imageUrl?: string | null;
-  isPublished?: boolean;
+  status?: "draft" | "published";
+  links?: PostLink[];
+  images?: PostImage[];
+};
+
+type ApiResponse<T> = {
+  message?: string;
+  data: T;
 };
 
 type CreatePostPayload = FormData;
@@ -80,11 +101,11 @@ export const createPost = createAsyncThunk<
   { rejectValue: ApiError }
 >("post/createPost", async (payload, { rejectWithValue }) => {
   try {
-    const data = await post<CreatePostResponse>("/posts", payload, {
+    const response = await post<ApiResponse<CreatePostResponse>>("/posts", payload, {
       withCredentials: true,
     });
 
-    return data;
+    return response.data;
   } catch (error: unknown) {
     return rejectWithValue(getErrorPayload(error, "Tạo bài viết thất bại"));
   }
@@ -96,8 +117,8 @@ export const getAllPosts = createAsyncThunk<
   { rejectValue: ApiError }
 >("post/getAllPosts", async (_, { rejectWithValue }) => {
   try {
-    const data = await get<GetAllPostsResponse>("/posts");
-    return data;
+    const response = await get<ApiResponse<GetAllPostsResponse>>("/posts");
+    return response.data;
   } catch (error: unknown) {
     return rejectWithValue(
       getErrorPayload(error, "Lấy danh sách bài viết thất bại"),
@@ -111,8 +132,8 @@ export const getPostBySlug = createAsyncThunk<
   { rejectValue: ApiError }
 >("post/getPostBySlug", async ({ slug }, { rejectWithValue }) => {
   try {
-    const data = await get<GetPostBySlugResponse>(`/posts/${slug}`);
-    return data;
+    const response = await get<ApiResponse<GetPostBySlugResponse>>(`/posts/${slug}`);
+    return response.data;
   } catch (error: unknown) {
     return rejectWithValue(
       getErrorPayload(error, "Lấy bài viết theo slug thất bại"),
@@ -126,10 +147,11 @@ export const updatePost = createAsyncThunk<
   { rejectValue: ApiError }
 >("post/updatePost", async ({ id, data: payload }, { rejectWithValue }) => {
   try {
-    const data = await put<UpdatePostResponse>(`/posts/${id}`, payload, {
+    const response = await put<ApiResponse<UpdatePostResponse>>(`/posts/${id}`, payload, {
       withCredentials: true,
     });
-    return data;
+
+    return response.data;
   } catch (error: unknown) {
     return rejectWithValue(
       getErrorPayload(error, "Cập nhật bài viết thất bại"),
@@ -143,7 +165,9 @@ export const deletePost = createAsyncThunk<
   { rejectValue: ApiError }
 >("post/deletePost", async ({ id }, { rejectWithValue }) => {
   try {
-    await del<DeletePostResponse>(`/posts/${id}`);
+    await del<DeletePostResponse>(`/posts/${id}`, {
+      withCredentials: true,
+    });
     return { id };
   } catch (error: unknown) {
     return rejectWithValue(getErrorPayload(error, "Xóa bài viết thất bại"));
@@ -184,6 +208,7 @@ export const postSlice = createSlice({
       .addCase(createPost.fulfilled, (state, action) => {
         state.loading = false;
         state.posts.unshift(action.payload);
+        state.selectedPost = action.payload;
         state.success = true;
       })
       .addCase(createPost.rejected, (state, action) => {
