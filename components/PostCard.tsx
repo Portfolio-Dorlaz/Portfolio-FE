@@ -2,10 +2,10 @@ import Link from "next/link";
 
 type PostCardPost = {
   id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string | null;
+  slug?: string | null;
+  title?: string | null;
+  excerpt?: string | null;
+  category?: string | null;
   createdAt?: string;
   publishedAt?: string | null;
   thumbnailUrl?: string | null;

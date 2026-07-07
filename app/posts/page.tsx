@@ -32,16 +32,21 @@ export default function PostsPage() {
   }, [posts]);
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      const matchCategory =
-        activeCategory === "Tất cả" || post.category === activeCategory;
+    const keyword = search.trim().toLowerCase();
 
-      const keyword = search.trim().toLowerCase();
+    return posts.filter((post) => {
+      const category = post.category ?? "";
+      const excerpt = post.excerpt ?? "";
+      const title = post.title ?? "";
+
+      const matchCategory =
+        activeCategory === "Tất cả" || category === activeCategory;
+
       const matchSearch =
         !keyword ||
-        post.title.toLowerCase().includes(keyword) ||
-        post.excerpt.toLowerCase().includes(keyword) ||
-        post.category.toLowerCase().includes(keyword);
+        title.toLowerCase().includes(keyword) ||
+        excerpt.toLowerCase().includes(keyword) ||
+        category.toLowerCase().includes(keyword);
 
       return matchCategory && matchSearch;
     });
@@ -80,23 +85,25 @@ export default function PostsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {categories.map((category) => {
-            const active = activeCategory === category;
+          {categories
+            .filter((category): category is string => !!category)
+            .map((category) => {
+              const active = activeCategory === category;
 
-            return (
-              <Button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`!rounded-full !px-[14px] !py-[10px] !font-semibold !shadow-none ${
-                  active
-                    ? "!border-blue-200 !bg-blue-50 !text-blue-700"
-                    : "!border-slate-200 !bg-white !text-slate-600 hover:!border-blue-200 hover:!bg-blue-50 hover:!text-blue-700"
-                }`}
-              >
-                {category}
-              </Button>
-            );
-          })}
+              return (
+                <Button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`!rounded-full !px-[14px] !py-[10px] !font-semibold !shadow-none ${
+                    active
+                      ? "!border-blue-200 !bg-blue-50 !text-blue-700"
+                      : "!border-slate-200 !bg-white !text-slate-600 hover:!border-blue-200 hover:!bg-blue-50 hover:!text-blue-700"
+                  }`}
+                >
+                  {category}
+                </Button>
+              );
+            })}
         </div>
       </section>
 
