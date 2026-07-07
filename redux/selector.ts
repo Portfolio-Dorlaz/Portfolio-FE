@@ -10,6 +10,7 @@ export const AuthBootstrappedSelector = (state: RootState) => state.auth.bootstr
 export const PostLoadingSelector = (state: RootState) => state.post.loading;
 export const PostErrorSelector = (state: RootState) => state.post.error;
 export const PostsSelector = (state: RootState) => state.post.posts;
+export const PostsAdminSelector = (state: RootState) => state.post.postsAdmin;
 export const PostDetailSelector = (state: RootState) => state.post.selectedPost;
 
 // Comments

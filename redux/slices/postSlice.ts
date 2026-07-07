@@ -73,6 +73,7 @@ type ApiError = {
 
 type PostState = {
   posts: Post[];
+  postsAdmin: Post[];
   selectedPost: Post | null;
   loading: boolean;
   error: ApiError | null;
@@ -118,6 +119,21 @@ export const getAllPosts = createAsyncThunk<
 >("post/getAllPosts", async (_, { rejectWithValue }) => {
   try {
     const response = await get<ApiResponse<GetAllPostsResponse>>("/posts");
+    return response.data;
+  } catch (error: unknown) {
+    return rejectWithValue(
+      getErrorPayload(error, "Lấy danh sách bài viết thất bại"),
+    );
+  }
+});
+
+export const getAllPostsAdmin = createAsyncThunk<
+  GetAllPostsResponse,
+  void,
+  { rejectValue: ApiError }
+>("post/getAllPostsAdmin", async (_, { rejectWithValue }) => {
+  try {
+    const response = await get<ApiResponse<GetAllPostsResponse>>("/posts/admin/all");
     return response.data;
   } catch (error: unknown) {
     return rejectWithValue(
@@ -176,6 +192,7 @@ export const deletePost = createAsyncThunk<
 
 const initialState: PostState = {
   posts: [],
+  postsAdmin:[],
   selectedPost: null,
   loading: false,
   error: null,
@@ -226,6 +243,21 @@ export const postSlice = createSlice({
         state.posts = action.payload;
       })
       .addCase(getAllPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || {
+          message: "Lấy danh sách bài viết thất bại",
+        };
+      })
+
+       .addCase(getAllPostsAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllPostsAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.postsAdmin = action.payload;
+      })
+      .addCase(getAllPostsAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || {
           message: "Lấy danh sách bài viết thất bại",

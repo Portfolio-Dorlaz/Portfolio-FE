@@ -5,11 +5,16 @@ import { Button, Input, Select, Table, Tag, Popconfirm, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { getAllPosts, deletePost } from "@/redux/slices/postSlice";
+import {
+  getAllPosts,
+  deletePost,
+  getAllPostsAdmin,
+} from "@/redux/slices/postSlice";
 import {
   PostsSelector,
   PostLoadingSelector,
   PostErrorSelector,
+  PostsAdminSelector,
 } from "@/redux/selector";
 import {
   DeleteOutlined,
@@ -33,7 +38,7 @@ type AdminPost = {
 export default function AdminPostsPage() {
   const dispatch = useAppDispatch();
 
-  const posts = useAppSelector(PostsSelector) as AdminPost[];
+  const posts = useAppSelector(PostsAdminSelector) as AdminPost[];
   const loading = useAppSelector(PostLoadingSelector);
   const error = useAppSelector(PostErrorSelector);
 
@@ -43,7 +48,7 @@ export default function AdminPostsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(getAllPosts());
+    dispatch(getAllPostsAdmin());
   }, [dispatch]);
 
   const normalizedPosts = useMemo(() => {
