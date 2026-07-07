@@ -462,7 +462,6 @@ export default function PostEditorForm({
                 >
                   <TextArea
                     rows={4}
-                    maxLength={240}
                     showCount
                     placeholder="Nhập excerpt cho bài viết"
                     className="!rounded-2xl !border-slate-200 !bg-slate-50 !px-4 !py-3 hover:!border-slate-300 focus:!border-blue-500"
