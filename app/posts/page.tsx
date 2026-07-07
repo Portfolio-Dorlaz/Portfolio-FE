@@ -11,6 +11,7 @@ import {
   PostErrorSelector,
 } from "@/redux/selector";
 import Link from "next/link";
+import { formatPostDate } from "@/utils/Date";
 
 export default function PostsPage() {
   const dispatch = useAppDispatch();
@@ -137,7 +138,7 @@ export default function PostsPage() {
                   {featuredPost.category}
                 </span>
                 {featuredPost.createdAt && (
-                  <span>{featuredPost.createdAt}</span>
+                  <span>{formatPostDate(featuredPost.createdAt)}</span>
                 )}
               </div>
 

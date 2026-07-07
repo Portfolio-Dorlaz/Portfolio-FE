@@ -1,85 +1,65 @@
+"use client";
+
 import PostCard from "@/components/PostCard";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { PostsSelector } from "@/redux/selector";
+import { getAllPosts } from "@/redux/slices/postSlice";
+import { useEffect } from "react";
 
 const featuredProjects = [
   {
     id: "f1",
     title: "Portfolio CMS Platform",
     description:
-      "Hệ thống quản lý portfolio với đăng nhập JWT, CRUD bài viết, quản lý project và phân tách rõ public/admin routes.",
-    stack: ["Next.js", "Express", "PostgreSQL"],
-    status: "Full-stack build",
+      "Nền tảng portfolio cá nhân tích hợp CMS với đăng nhập, phân quyền người dùng, CRUD bài viết, quản lý bình luận và tách rõ khu vực public/admin.",
+    stack: ["Next.js", "React", "Prisma", "Render"],
+    status: "Full-stack project",
   },
   {
     id: "f2",
-    title: "Gameplay Prototype Systems",
+    title: "Ashen Souls",
     description:
-      "Prototype các core loop, progression flow và interaction systems với tư duy thiên về gameplay readability và iteration nhanh.",
-    stack: ["Game Design", "Systems", "Prototype"],
-    status: "Game dev focus",
+      "Dự án game roguelite 2D top-down phát triển bằng Unity, tập trung vào combat theo wave, thu thập soul từ enemy và hệ thống nâng cấp chỉ số, kỹ năng theo tiến trình chơi.",
+    stack: ["Unity", "C#", "Game Systems"],
+    status: "Game project",
   },
   {
     id: "f3",
-    title: "Interactive Web Experiences",
+    title: "Frontend UI Systems",
     description:
-      "Thiết kế và xây dựng các landing page, UI system và web experience có độ polish cao, rõ luồng và dễ mở rộng.",
-    stack: ["UI/UX", "Frontend", "Product Thinking"],
-    status: "Experience design",
+      "Thiết kế và phát triển giao diện web theo hướng rõ bố cục, responsive và dễ mở rộng, tập trung vào component-based UI, luồng người dùng và trải nghiệm hiển thị nội dung.",
+    stack: ["React", "Next.js", "UI/UX"],
+    status: "Frontend focus",
   },
 ];
-
 const skills = [
   {
+    title: "Unity & C#",
+    text: "Phát triển gameplay bằng Unity và C#, tập trung vào combat loop, hệ thống kỹ năng, progression và các cơ chế tương tác trong game 2D.",
+  },
+  {
     title: "Gameplay Systems",
-    text: "Thiết kế mechanics, game loop và interaction flow với ưu tiên tính rõ ràng và khả năng iterate nhanh.",
+    text: "Thiết kế và triển khai các hệ thống gameplay như wave spawning, soul collection, stat upgrade và milestone rewards theo hướng dễ mở rộng và dễ iterate.",
   },
   {
-    title: "Web Apps",
-    text: "Xây dựng giao diện và sản phẩm web với Next.js, state management, API integration và trải nghiệm mượt.",
+    title: "Next.js & React",
+    text: "Xây dựng giao diện web với Next.js và React, tổ chức component rõ ràng, quản lý state và kết nối API cho các luồng hiển thị nội dung và tương tác người dùng.",
   },
   {
-    title: "CMS & Admin Tools",
-    text: "Thiết kế dashboard, auth flow, CRUD structure và content workflow cho các hệ thống quản trị cá nhân.",
-  },
-  {
-    title: "UI Implementation",
-    text: "Biến mockup hoặc ý tưởng thành giao diện thật với layout rõ, component sạch và responsive tốt.",
-  },
-];
-
-const postList = [
-  {
-    id: "1",
-    slug: "xay-dung-portfolio-cms-voi-nextjs-va-express",
-    title: "Xây dựng Portfolio CMS với Next.js và Express",
-    excerpt:
-      "Một hướng đi gọn cho project CV: frontend public đẹp, backend JWT auth, admin CRUD bài viết.",
-    category: "Development",
-    createdAt: "28 Jun 2026",
-    readTime: "6 min read",
-  },
-  {
-    id: "2",
-    slug: "thiet-ke-landing-page-sang-sach-va-de-doc",
-    title: "Thiết kế landing page sáng, sạch và dễ đọc",
-    excerpt:
-      "Tối ưu phần hero, card bài viết và điều hướng để người dùng xem nội dung ngay cả khi chưa đăng nhập.",
-    category: "UI/UX",
-    createdAt: "27 Jun 2026",
-    readTime: "4 min read",
-  },
-  {
-    id: "3",
-    slug: "jwt-auth-co-ban-cho-blog-cms-ca-nhan",
-    title: "JWT auth cơ bản cho blog CMS cá nhân",
-    excerpt:
-      "Tách rõ public route và admin route để hệ thống đơn giản, dễ debug và phù hợp project portfolio.",
-    category: "Backend",
-    createdAt: "26 Jun 2026",
-    readTime: "7 min read",
+    title: "CMS & Admin Flow",
+    text: "Xây dựng hệ thống tích hợp CMS với đăng nhập, phân quyền, CRUD bài viết, quản lý bình luận và tách rõ khu vực public/admin.",
   },
 ];
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
+
+  const postList = useAppSelector(PostsSelector);
+
+  useEffect(() => {
+    dispatch(getAllPosts());
+  }, [dispatch]);
+
   return (
     <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#edf4ff_100%)] text-slate-900">
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.10),transparent_22%)]" />
