@@ -11,7 +11,6 @@ import {
   getAllPostsAdmin,
 } from "@/redux/slices/postSlice";
 import {
-  PostsSelector,
   PostLoadingSelector,
   PostErrorSelector,
   PostsAdminSelector,
@@ -105,7 +104,7 @@ export default function AdminPostsPage() {
       await dispatch(deletePost({ id })).unwrap();
       message.success("Đã xóa bài viết");
 
-      await dispatch(getAllPosts()).unwrap();
+      await dispatch(getAllPostsAdmin()).unwrap();
     } catch (err) {
       console.error(err);
       message.error("Xóa bài viết thất bại");
